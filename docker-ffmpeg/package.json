@@ -4,13 +4,14 @@
   "type": "module",
   "main": "ffmpeg.js",
   "scripts": {
-  
+    "dev": "node --watch src/ffmpeg.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^5.1.0",
     "multer": "^2.0.2"
   }

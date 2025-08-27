@@ -1,4 +1,5 @@
 .env
+main/.env
 
-/node_modules
+main/node_modules
 docker-ffmpeg/node_modules
