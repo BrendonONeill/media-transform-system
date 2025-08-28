@@ -2,6 +2,9 @@ import Express from "express"
 import fs from "node:fs"
 import 'dotenv/config'
 import cors from 'cors';
+import path from 'path'
+import { dirname} from 'path';
+import { fileURLToPath } from 'url';
 
 const app = Express()
 
@@ -11,6 +14,15 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['*']
 }));
+
+
+export const __dirname = dirname(fileURLToPath(import.meta.url));
+app.use(Express.json({}));
+app.use(Express.urlencoded({ extended: true }));
+
+
+// Serve static files (HTML, CSS, JS)
+app.use('/', Express.static(path.join(__dirname, 'public')));
 
 app.use("/abc", async (req,res) => {
     // temp thinking
@@ -61,7 +73,7 @@ app.use("/test", async (req,res) => {
     const fileName2 = readStream2.path.split("\\")[3]
     console.log("Called-----")
     try {
-        const a = await fetch("http://localhost:3007/", {method:"POST", body:readStream2, headers: {
+        const a = await fetch("http://localhost:3005/", {method:"POST", body:readStream2, headers: {
         'Content-Type': 'video/mkv',
         'Content-Length': stats2.size.toString(),
         'X-Original-Filename': fileName2

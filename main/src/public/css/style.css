@@ -1,0 +1,38 @@
+*,*::after,*::before
+{
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-sizing :border-box
+}
+
+
+body
+{
+    background-color: aquamarine;
+}
+
+
+form
+{
+    padding: 1rem;
+    background-color: darkorange;
+    display: flex;
+    flex-flow: column;
+    gap: 1rem;
+}
+
+
+input[type=text]
+{
+    width: 50%;
+}
+
+input[type=button]
+{
+    padding: 1rem;
+    width: 150px;
+    border-radius: 5px;
+    background-color: saddlebrown;
+    color: white;
+}
