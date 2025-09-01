@@ -35,21 +35,23 @@ function videoWork()
     while(videoList.length >= 1)
     {
         console.log("test was called")
-        test(videoList[0])
+        ffmpegAction(videoList[0])
         videoEmitter.emit('finished', `new${videoList[0]}`)
+        fs.rmSync(`temp/${videoList[0]}`)
         videoList.shift()
     }
     return 
 }
 
 
-function test(file)
+function ffmpegAction(file)
 {
+    console.log(videoList)
     console.log(videoList[0], ' is getting converted')
     const results = spawnSync('ffmpeg',['-i', `temp/${file}`, '-map', '0:0', '-map', '0:1', '-c', 'copy', `temp/new${file}`],{})
 
     if (results.error) {
-        throw new Error(`FFmpeg spawn error: ${result.error.message}`);
+        throw new Error(`FFmpeg spawn error: ${results.error.message}`);
     }
 
     if (results.status !== 0) {
@@ -67,6 +69,7 @@ async function returnVideo(videoFile)
 {
       const readStream = fs.createReadStream(`temp/${videoFile}`);
       const stats = fs.statSync(`temp/${videoFile}`);
+      console.log(stats.size, " : file size")
       console.log("Called-----")
       try {
           const a = await fetch("http://localhost:3000/videoreturn", {method:"POST", body:readStream, headers: {

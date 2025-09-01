@@ -1,8 +1,7 @@
 import Express from 'express'
-import upload from '../utils/multer.js'
 import fs from "node:fs"
-import { main } from '../utils/ffmpeg.js'
 import cors from 'cors';
+import {generationFile} from '../utils/createFile.js'
 
 const app = Express()
 // Built-in JSON parser
@@ -28,21 +27,28 @@ app.use("/hello", (req, res) => {
  res.json("success")
 })
 
+app.use("/finishedUpload",(req, res) => {
+  let fileInformation = req.body
+  generationFile(fileInformation)
+
+})
+
 app.use("/", (req, res) => {
  console.log("i'm being called")
- const writeStream = fs.createWriteStream(`temp/${req.headers['x-original-filename']}`);
+ const writeStream = fs.createWriteStream(`bucket/${req.headers['x-chunk-number']}__${req.headers['x-original-filename']}`);
  req.pipe(writeStream)
  writeStream.on("finish", () => {
-  main(req.headers['x-original-filename'])
   res.json("success")
  })
- writeStream.on("error", () => {
+ writeStream.on("error", (e) => {
+  console.log(e)
   res.json("error")
  })
- 
 })
 
 
-app.listen("3007",() => {
-    console.log(`server running on 3007`)
+
+
+app.listen("3002",() => {
+    console.log(`server running on 3002`)
 })
