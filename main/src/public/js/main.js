@@ -18,6 +18,7 @@ submit.addEventListener("click", (e) => {
 
 async function upload()
 {
+    debugger
     let count = 0 
     while(count <= filesCollection.length - 1)
     {
@@ -29,9 +30,7 @@ async function upload()
 }
 
 async function uploadPrep(chunksObj)
-{
-    console.log(chunksObj)
-    return
+{ 
     let chunks = chunksObj.numberOfChunks - 1
     let chunksObjArr = chunksObj.mediaChunks
     let count = 0
@@ -41,18 +40,31 @@ async function uploadPrep(chunksObj)
         if(arrChunks.length < 3)
         {
             arrChunks.push({chunk:chunksObjArr[count],id:count})
+            count++
         }
         else
         {
             arrChunks = await uploadFetch(arrChunks) 
         }
-        count++
+        
     }
     if(arrChunks.length > 0)
     {
         arrChunks = uploadFetch(arrChunks)
     }
-    let res = await fetch("http://localhost:3006/", {method:"POST", body:JSON.stringify({folder: chunksObj.name.split(".")[0], ext: chunksObj.name.split(".")[1]}), headers: {'Content-Type': 'application/json'}})
+    try {
+        let res = await fetch("http://localhost:3002/finishedUpload", {method:"POST", body:JSON.stringify({name: chunksObj.name.split(".")[0], ext: chunksObj.name.split(".")[1],chunks:chunks}), headers: {'Content-Type': 'application/json'}})
+        if(res.ok)
+        {
+            return
+        }
+        else
+        {
+            throw new Error("failed to upload")
+        }
+    } catch (error) {
+        console.error(error)
+    }
 }
 
 async function uploadFetch(arrChunks)
@@ -61,7 +73,7 @@ async function uploadFetch(arrChunks)
         let taskPromises = []
         
         for (const obj of arrChunks) {
-        const promise = await fetch("http://localhost:3006/", {method:"POST", body:obj.chunk, headers: {'Content-Type': obj.chunk.type, 'Content-Length': obj.chunk.size.toString(), 'X-Original-Filename': obj.chunk.name.split(".")[0], 'X-Chunk-Number': obj.id},duplex: 'half'})
+        const promise = await fetch("http://localhost:3002/", {method:"POST", body:obj.chunk, headers: {'Content-Type': obj.chunk.type, 'Content-Length': obj.chunk.size.toString(), 'X-Original-Filename': obj.chunk.name.split(".")[0], 'X-Chunk-Number': obj.id},duplex: 'half'})
         taskPromises.push(promise);
         }
 
@@ -94,6 +106,7 @@ function chunkVideo(file)
           mediaChunks.push(chunk)
           start = start + chunkSize
      }
+     console.log(mediaChunks)
     return {mediaChunks: mediaChunks, type: file.type, name: file.name, numberOfChunks: id, size: file.size}
 }
 

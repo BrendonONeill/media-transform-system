@@ -6,26 +6,47 @@
     box-sizing :border-box
 }
 
+:root {
+  --main-bg-colour: #0077b6;
+  --main-bg-colour-dark: #03045e;
+  --sub-bg-colour: #caf0f8;
+}
+
 
 body
 {
-    background-color: aquamarine;
+    background-color: var(--sub-bg-colour);
+    padding: 1rem;
 }
 
 
 form
 {
     padding: 1rem;
-    background-color: darkorange;
+    background-color: var(--main-bg-colour);
+    color: white;
     display: flex;
     flex-flow: column;
     gap: 1rem;
+    border-radius: 5px;
+}
+
+label
+{
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 
 input[type=text]
 {
     width: 50%;
+    border-radius: 5px;
+    border: 2px solid var(--main-bg-colour-dark);
+    padding: 0.4rem;
 }
 
 input[type=button]
@@ -33,6 +54,7 @@ input[type=button]
     padding: 1rem;
     width: 150px;
     border-radius: 5px;
-    background-color: saddlebrown;
+    background-color: var(--main-bg-colour-dark);
     color: white;
+    cursor: pointer;
 }
