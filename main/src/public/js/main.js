@@ -1,10 +1,8 @@
 const files = document.getElementById("filesForm");
 const submit = document.getElementById("submit");
+const locationForm = document.getElementById("locationForm");
 
 let filesCollection = []
-
-
-
 
 files.addEventListener("change", (e) => {
  filesCollection = e.target.files
@@ -14,7 +12,6 @@ submit.addEventListener("click", (e) => {
     e.preventDefault()
     upload()
 })
-
 
 async function upload()
 {
@@ -53,7 +50,21 @@ async function uploadPrep(chunksObj)
         arrChunks = uploadFetch(arrChunks)
     }
     try {
-        let res = await fetch("http://localhost:3002/finishedUpload", {method:"POST", body:JSON.stringify({name: chunksObj.name.split(".")[0], ext: chunksObj.name.split(".")[1],chunks:chunks}), headers: {'Content-Type': 'application/json'}})
+        let res = await fetch("http://localhost:3003/upload/finishedupload", {method:"POST", body:JSON.stringify({name: chunksObj.name.split(".")[0], ext: chunksObj.name.split(".")[1],chunks:chunks}), headers: {'Content-Type': 'application/json'}})
+        if(res.ok)
+        {
+            
+        }
+        else
+        {
+            throw new Error("failed to upload")
+        }
+    } catch (error) {
+        console.error(error)
+    }
+
+    try {
+        let res = await fetch("http://localhost:3000/return/setlocation", {method:"POST", body:JSON.stringify({name: chunksObj.name, location: locationForm.value}), headers: {'Content-Type': 'application/json'}})
         if(res.ok)
         {
             return
@@ -73,7 +84,7 @@ async function uploadFetch(arrChunks)
         let taskPromises = []
         
         for (const obj of arrChunks) {
-        const promise = await fetch("http://localhost:3002/", {method:"POST", body:obj.chunk, headers: {'Content-Type': obj.chunk.type, 'Content-Length': obj.chunk.size.toString(), 'X-Original-Filename': obj.chunk.name.split(".")[0], 'X-Chunk-Number': obj.id},duplex: 'half'})
+        const promise = await fetch("http://localhost:3003/upload/videochunks", {method:"POST", body:obj.chunk, headers: {'Content-Type': obj.chunk.type, 'Content-Length': obj.chunk.size.toString(), 'X-Original-Filename': obj.chunk.name.split(".")[0], 'X-Chunk-Number': obj.id},duplex: 'half'})
         taskPromises.push(promise);
         }
 

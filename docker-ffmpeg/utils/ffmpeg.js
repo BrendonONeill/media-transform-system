@@ -6,17 +6,15 @@ const videoList = []
 let active = false
 
 videoEmitter.on('add', videoAddTask);
-videoEmitter.on('finished', returnVideo)
 
 export async  function main(fileName)
 {
- console.log("Main is called")
+ console.log("Starting ffmpeg process")
  videoEmitter.emit('add', fileName)
 }
 
 export function videoAddTask(fileName)
 {
-  console.log("videoAddTask")
   videoList.push(fileName)
   if(!active)
   {
@@ -34,9 +32,7 @@ function videoWork()
 {
     while(videoList.length >= 1)
     {
-        console.log("test was called")
         ffmpegAction(videoList[0])
-        videoEmitter.emit('finished', `new${videoList[0]}`)
         fs.rmSync(`temp/${videoList[0]}`)
         videoList.shift()
     }
@@ -46,7 +42,6 @@ function videoWork()
 
 function ffmpegAction(file)
 {
-    console.log(videoList)
     console.log(videoList[0], ' is getting converted')
     const results = spawnSync('ffmpeg',['-i', `temp/${file}`, '-map', '0:0', '-map', '0:1', '-c', 'copy', `temp/new${file}`],{})
 
@@ -65,19 +60,3 @@ function ffmpegAction(file)
 
 
 
-async function returnVideo(videoFile)
-{
-      const readStream = fs.createReadStream(`temp/${videoFile}`);
-      const stats = fs.statSync(`temp/${videoFile}`);
-      console.log(stats.size, " : file size")
-      console.log("Called-----")
-      try {
-          const a = await fetch("http://localhost:3000/videoreturn", {method:"POST", body:readStream, headers: {
-          'Content-Type': 'video/mkv',
-          'Content-Length': stats.size.toString(),
-          'X-Original-Filename': videoFile
-        },duplex: 'half'})
-      } catch (error) {
-          console.log(error)
-      }
-}

@@ -1,14 +1,15 @@
 services:
   app:
-    build: .
+    build: 
+      context: ./docker-ffmpeg
+      dockerfile: Dockerfile
     image: node-ffmpeg:latest
     ports:
-     - "3005:3000"
+     - "3006:3000"
     env_file:
      - .env
     deploy:
       resources:
         limits:
           cpus: '2' 
-          memory: 5g 
-        
+          memory: 20g 
