@@ -4,8 +4,9 @@ const locationForm = document.getElementById("locationForm");
 
 let filesCollection = []
 
-files.addEventListener("change", (e) => {
+files.addEventListener("change",(e) => {
  filesCollection = e.target.files
+ fetch('http://localhost:3003/videoinfo',{method:"post", body: filesCollection[0],duplex: 'half',  headers: {'Content-Type': filesCollection[0].type, 'Content-Length': filesCollection[0].size.toString(), 'X-Original-Filename': filesCollection[0].name}}).then((res) => res.json()).then((data) => (console.log(data)))
 })
 
 submit.addEventListener("click", (e) => {

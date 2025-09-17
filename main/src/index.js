@@ -15,12 +15,8 @@ export const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(Express.json({}));
 app.use(Express.urlencoded({ extended: true }));
 
-
-
-
 // Serve static files (HTML, CSS, JS)
 app.use('/', Express.static(path.join(__dirname, 'public')));
-
 
 
 app.use("/return", videoReturnedRouter)
