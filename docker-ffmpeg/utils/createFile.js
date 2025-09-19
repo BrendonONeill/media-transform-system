@@ -1,5 +1,4 @@
 import fs from "node:fs"
-import { main } from '../utils/ffmpeg.js'
 import { buffer } from 'stream/consumers';
 import { Blob } from 'buffer';
 
@@ -38,19 +37,53 @@ export  async function generationFile(videoInformation)
             
             i++;
         }
-        console.log("hello........")
         removeChunks(videoInformation.chunks,videoInformation.name)
-        main(`${videoInformation.name}.${videoInformation.ext}`)
-        chunkFileAndSendChunks(`${videoInformation.name}.${videoInformation.ext}`)
-        removeVideo(`${videoInformation.name}.${videoInformation.ext}`)
+        
 
     } catch (error) {
         
     }
 }
 
+export async function chunkCheck(fileInfo)
+{
+    console.log("checking chunks")
+    let delayAmount = [0,30000,60000]
+    let delayCount = 0
+    let fileAmount = fileInfo.chunks
+    let i = 0
+    while(i < fileAmount)
+    {
+        console.log("checking... ", i)
+        if(delayCount > 0)
+        {
+            await wait(delayAmount[delayCount]);
+        }
+        else if(delayCount > 2)
+        {
+            return false
+        }
+        let check = fs.existsSync(`./bucket/${i}__${fileInfo.name}`)
+        if(check)
+        {
+            i++
+            delayCount = 0
+        }
+        else
+        {
+            delayCount++
+        }
+    }
 
-function removeVideo(name)
+    return true
+}
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+
+export function removeVideo(name)
 {
             const filename = `./temp/${name}`;
             if (!fs.existsSync(filename)) {
@@ -77,7 +110,7 @@ function removeChunks(chunks,name)
 }
 
 
-async function chunkFileAndSendChunks(fileName)
+export async function chunkFileAndSendChunks(fileName)
 {
     const readStream = fs.createReadStream(`temp/new${fileName}`);
     const fileBuffer = await buffer(readStream);

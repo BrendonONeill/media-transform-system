@@ -1,5 +1,6 @@
-import {generationFile} from '../../utils/createFile.js'
+import {generationFile, chunkCheck, chunkFileAndSendChunks, removeVideo} from '../../utils/createFile.js'
 import fs from "node:fs"
+import { main } from '../../utils/ffmpeg.js';
 
 export async function receivingChunks(req, res)
 {
@@ -17,6 +18,31 @@ export async function receivingChunks(req, res)
 
 export async function finishedUpload(req, res){
   let fileInformation = req.body
-  generationFile(fileInformation)
-  res.json("thank you")
+  if(await chunkCheck(fileInformation))
+  {
+    generationFile(fileInformation)
+    main(`${fileInformation.name}.${fileInformation.ext}`)
+    chunkFileAndSendChunks(`${fileInformation.name}.${fileInformation.ext}`)
+    removeVideo(`${fileInformation.name}.${fileInformation.ext}`)
+    res.json("thank you")
+  }
+  else
+  {
+     res.json("error uploading file")
+  }
+}
+
+export async function finishedUploadffprob(req, res){
+  let fileInformation = req.body
+  if(await chunkCheck(fileInformation))
+  {
+    generationFile(fileInformation)
+    res.json("thank you")
+  }
+  else
+  {
+     res.json("error uploading file")
+  }
+ 
+  
 }

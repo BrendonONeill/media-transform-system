@@ -4,7 +4,7 @@
   "type": "module",
   "main": "ffmpeg.js",
   "scripts": {
-    "dev": "node --watch src/ffmpeg.js"
+    "dev": "node src/ffmpeg.js"
   },
   "keywords": [],
   "author": "",

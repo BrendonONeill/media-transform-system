@@ -1,5 +1,5 @@
 import express from 'express'
-import {receivingChunks, finishedUpload} from './index.js'
+import {receivingChunks, finishedUpload, finishedUploadffprob} from './index.js'
 
 
 const router = express.Router()
@@ -12,6 +12,11 @@ router
 router
 .route("/finishedupload")
 .post(finishedUpload)
+
+router
+.route("/finisheduploadffprob")
+.post(finishedUploadffprob)
+
 
 
 export default router

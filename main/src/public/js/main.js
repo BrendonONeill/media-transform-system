@@ -5,23 +5,22 @@ const locationForm = document.getElementById("locationForm");
 let filesCollection = []
 
 files.addEventListener("change",(e) => {
- filesCollection = e.target.files
- fetch('http://localhost:3003/videoinfo',{method:"post", body: filesCollection[0],duplex: 'half',  headers: {'Content-Type': filesCollection[0].type, 'Content-Length': filesCollection[0].size.toString(), 'X-Original-Filename': filesCollection[0].name}}).then((res) => res.json()).then((data) => (console.log(data)))
+ filesCollection = []
+ filesCollection.push(chunkVideo(e.target.files[0]))
+ uploadFileForInfo(filesCollection[0])
 })
 
 submit.addEventListener("click", (e) => {
     e.preventDefault()
-    upload()
+    upload(uploadPrep)
 })
 
-async function upload()
+async function upload(cb)
 {
-    debugger
     let count = 0 
     while(count <= filesCollection.length - 1)
     {
-        let chunks = chunkVideo(filesCollection[count])
-        uploadPrep(chunks)
+        cb(filesCollection[count])
         count++
     }
 
@@ -99,6 +98,20 @@ async function uploadFetch(arrChunks)
     
 }
 
+async function uploadFileForInfo(chunks)
+{
+    try {
+        for([index, obj] of chunks.mediaChunks.entries())
+        {
+            let res =  await fetch("http://localhost:3003/upload/videochunks", {method:"POST", body:obj, headers: {'Content-Type': obj.type, 'Content-Length': obj.size.toString(), 'X-Original-Filename': obj.name.split(".")[0], 'X-Chunk-Number': index},duplex: 'half'})
+            console.log(res)
+        }
+        let res = await fetch("http://localhost:3003/upload/finisheduploadffprob", {method:"POST", body:JSON.stringify({name: chunks.name.split(".")[0], ext: chunks.name.split(".")[1],chunks:chunks.mediaChunks.length - 1}), headers: {'Content-Type': 'application/json'}})
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 function chunkVideo(file)
 {
     let mediaChunks = []
@@ -118,7 +131,6 @@ function chunkVideo(file)
           mediaChunks.push(chunk)
           start = start + chunkSize
      }
-     console.log(mediaChunks)
     return {mediaChunks: mediaChunks, type: file.type, name: file.name, numberOfChunks: id, size: file.size}
 }
 
