@@ -88,7 +88,7 @@ export function removeVideo(name)
             const filename = `./temp/${name}`;
             if (!fs.existsSync(filename)) {
                 
-                console.log(`No more files found. Stopped at ${i}`);
+                console.log(`No more files found at ./temp/${name}`);
             }
             fs.rmSync(filename)
 }

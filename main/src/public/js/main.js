@@ -1,6 +1,7 @@
 const files = document.getElementById("filesForm");
 const submit = document.getElementById("submit");
 const locationForm = document.getElementById("locationForm");
+const form = document.getElementById("form");
 
 let filesCollection = []
 
@@ -107,6 +108,12 @@ async function uploadFileForInfo(chunks)
             console.log(res)
         }
         let res = await fetch("http://localhost:3003/upload/finisheduploadffprob", {method:"POST", body:JSON.stringify({name: chunks.name.split(".")[0], ext: chunks.name.split(".")[1],chunks:chunks.mediaChunks.length - 1}), headers: {'Content-Type': 'application/json'}})
+        if(res.ok)
+        {
+            let data = await res.json()
+            generateFormParts()
+            console.log(data);
+        }
     } catch (error) {
         console.log(error)
     }
@@ -135,3 +142,16 @@ function chunkVideo(file)
 }
 
 
+function generateFormParts()
+{
+    let label = document.createElement("label");
+    label.append("testing")
+    let input = document.createElement("input");
+    label.append(input)
+    form.append(label)
+    let label2 = document.createElement("label");
+    label2.append("testing")
+    let input2 = document.createElement("input");
+    label2.append(input2)
+    form.append(label2)
+}

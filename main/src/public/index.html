@@ -14,16 +14,18 @@
         <script src="js/main.js" async defer></script>
     </head>
     <body>
-        <form enctype="multipart/form-data">
+        <h1>Video converter</h1>
+        <form enctype="multipart/form-data" id="form">
             <label for="">
                 <input type="file" name="filesForm" multiple accept="video/* video/mkv"  id="filesForm">
             </label>
-            <label for="textForm">Command
-                <input type="text" name="textForm" id="textForm" value="'-i', `temp/${file}`, '-map', '0:0', '-map', '0:1', '-c', 'copy', `temp/new${file}'">
-            </label>
-            <label for="locationForm">Location
+            <label for="locationForm">Location:
                 <input type="text" name="locationForm" id="locationForm">
             </label>
+            <div>
+                <p>Command:</p>
+                <p>'-i temp/${file} -map 0:0 -map 0:1 -c copy temp/new${file}'</p>
+            </div>
             <input type="button" value="Submit" id="submit">
         </form>
         
