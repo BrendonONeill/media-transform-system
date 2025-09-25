@@ -15,10 +15,24 @@
     </head>
     <body>
         <h1>Video converter</h1>
+        <div class="video-info-container">
+            <div class="video-image">
+                <img id="screenshot" width="640" height="360" />
+            </div>
+            <div class="video-info">
+                <p>Name:</p>
+                <h2 id="file-name"></h2>
+                <p>width:</p>
+                <h2 id="file-width"></h2>
+            </div>
+        </div>
         <form enctype="multipart/form-data" id="form">
             <label for="">
                 <input type="file" name="filesForm" multiple accept="video/* video/mkv"  id="filesForm">
             </label>
+            <div id="generated-blocks-container">
+
+            </div>
             <label for="locationForm">Location:
                 <input type="text" name="locationForm" id="locationForm">
             </label>
@@ -28,6 +42,8 @@
             </div>
             <input type="button" value="Submit" id="submit">
         </form>
-        
+        <div>
+            <canvas id="canvas" style="border:1px solid #000"></canvas>
+        </div>
     </body>
 </html>

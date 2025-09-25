@@ -2,13 +2,24 @@ const files = document.getElementById("filesForm");
 const submit = document.getElementById("submit");
 const locationForm = document.getElementById("locationForm");
 const form = document.getElementById("form");
+const formBlock = document.getElementById("generated-blocks-container");
+
+let videoInfo = ""
+const fileName = document.getElementById("file-name");
+const fileWidth = document.getElementById("file-width");
+const canvas = document.getElementById("canvas");
+let url = ""
 
 let filesCollection = []
 
-files.addEventListener("change",(e) => {
+files.addEventListener("change",async (e) => {
  filesCollection = []
  filesCollection.push(chunkVideo(e.target.files[0]))
- uploadFileForInfo(filesCollection[0])
+ await uploadFileForInfo(filesCollection[0])
+ url = URL.createObjectURL(e.target.files[0])
+ createScreenShot()
+ fileName.textContent = e.target.files[0].name.split(".")[0]
+ fileWidth.textContent = `${videoInfo[streams][0].width} x ${videoInfo.streams[0].height}`
 })
 
 submit.addEventListener("click", (e) => {
@@ -113,6 +124,7 @@ async function uploadFileForInfo(chunks)
             let data = await res.json()
             generateFormParts()
             console.log(data);
+            videoInfo = data;
         }
     } catch (error) {
         console.log(error)
@@ -148,10 +160,37 @@ function generateFormParts()
     label.append("testing")
     let input = document.createElement("input");
     label.append(input)
-    form.append(label)
+    formBlock.append(label)
     let label2 = document.createElement("label");
     label2.append("testing")
     let input2 = document.createElement("input");
     label2.append(input2)
-    form.append(label2)
+    formBlock.append(label2)
+}
+
+function createScreenShot()
+{
+    const video = document.createElement("video");
+    video.src = url;
+    video.load();
+    video.muted = true; // avoid autoplay blocking
+    video.playsInline = true;
+
+    video.addEventListener("loadedmetadata", () => {
+        video.currentTime = 12;
+    });
+
+    video.addEventListener("seeked", () => {
+          const ctx = canvas.getContext("2d");
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+
+          // draw current frame into canvas
+          ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+
+          // export as image
+          screenshot.src = canvas.toDataURL("image/png");
+
+          // cleanup blob URL if you won’t reuse
+          URL.revokeObjectURL(url);})
 }

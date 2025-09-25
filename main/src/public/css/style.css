@@ -19,6 +19,11 @@ body
     padding: 1rem;
 }
 
+img
+{
+    max-width: 100%;
+}
+
 
 form
 {
@@ -38,6 +43,7 @@ label
     align-items: flex-start;
     flex-direction: column;
     gap: 0.5rem;
+    padding: 0.3rem;
 }
 
 
@@ -57,4 +63,38 @@ input[type=button]
     background-color: var(--main-bg-colour-dark);
     color: white;
     cursor: pointer;
+}
+
+#generated-blocks-container
+{
+    background-color: var(--main-bg-colour);
+    overflow-y: scroll;
+    max-height: 200px;
+    min-height: 200px;
+    border-radius: 5px;
+    border: 2px solid var(--sub-bg-colour);
+    padding: 0.3rem;
+}
+
+canvas
+{
+    display: none;
+}
+
+
+.video-info-container
+{
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+}
+
+.video-image
+{
+    grid-column: 1/2;
+}
+
+.video-info
+{
+    grid-column: 2/3;
+    padding: 1rem;
 }
