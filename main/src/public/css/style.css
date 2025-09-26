@@ -86,6 +86,8 @@ canvas
 {
     display: grid;
     grid-template-columns: 1fr 2fr;
+    padding: 1rem;
+    background-color: #efefef;
 }
 
 .video-image
@@ -97,4 +99,64 @@ canvas
 {
     grid-column: 2/3;
     padding: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    grid-template-rows: repeat(3,1fr);
+    gap: 0.5rem;
+}
+
+.video-info-block
+{
+    background-color: var(--main-bg-colour);
+    color: white;
+    border-radius: 5px;
+    padding: 1rem;
+    font-size: 2rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-name
+{
+    grid-column: 1/3;
+    grid-row: 1/2;
+    justify-content: flex-start;
+}
+
+.video-hxl
+{
+    grid-column: 1/2;
+    grid-row: 2/3;
+}
+
+.video-ext
+{
+    grid-column: 3/4;
+    grid-row: 1/2;
+}
+
+.video-ratio
+{
+    grid-column: 2/3;
+    grid-row: 2/3;
+}
+
+.video-streams
+{
+    grid-column: 3/4;
+    grid-row: 2/3;
+}
+
+.video-length
+{
+    grid-column: 1/2;
+    grid-row: 3/4;
+}
+
+.video-size
+{
+    grid-column: 2/3;
+    grid-row: 3/4;
 }

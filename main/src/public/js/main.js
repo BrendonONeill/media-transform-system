@@ -4,12 +4,11 @@ const locationForm = document.getElementById("locationForm");
 const form = document.getElementById("form");
 const formBlock = document.getElementById("generated-blocks-container");
 
+let videoDetails = { duration:"", size:"", name:"", ext:""}
 let videoInfo = ""
-const fileName = document.getElementById("file-name");
-const fileWidth = document.getElementById("file-width");
+let videoInfoCard = document.querySelector(".video-info");
 const canvas = document.getElementById("canvas");
 let url = ""
-
 let filesCollection = []
 
 files.addEventListener("change",async (e) => {
@@ -18,8 +17,10 @@ files.addEventListener("change",async (e) => {
  await uploadFileForInfo(filesCollection[0])
  url = URL.createObjectURL(e.target.files[0])
  createScreenShot()
- fileName.textContent = e.target.files[0].name.split(".")[0]
- fileWidth.textContent = `${videoInfo[streams][0].width} x ${videoInfo.streams[0].height}`
+ videoDetails.name = e.target.files[0].name.split(".")[0];
+ videoDetails.ext = e.target.files[0].name.split(".")[1];
+ videoDetails.size = e.target.files[0].size;
+ generateVideoInformationCard(e.target.files[0])
 })
 
 submit.addEventListener("click", (e) => {
@@ -177,7 +178,11 @@ function createScreenShot()
     video.playsInline = true;
 
     video.addEventListener("loadedmetadata", () => {
+        document.getElementById("video-duration").textContent = formatTime(video.duration);
+        videoDetails.duration = video.duration;
         video.currentTime = 12;
+        
+        
     });
 
     video.addEventListener("seeked", () => {
@@ -193,4 +198,109 @@ function createScreenShot()
 
           // cleanup blob URL if you won’t reuse
           URL.revokeObjectURL(url);})
+}
+
+function generateVideoInformationCard(file)
+{
+
+    //Name
+    let nameDiv = document.createElement("div")
+    nameDiv.classList.add("video-name","video-info-block")
+    let nameText = document.createElement("p");
+    nameText.textContent = videoDetails.name;
+    nameDiv.append(nameText)
+
+
+    //size
+    let videoHxLDiv = document.createElement("div");
+    videoHxLDiv.classList.add("video-hxl", "video-info-block")
+    let videoHxLText = document.createElement("p");
+    videoHxLText.textContent = `${videoInfo.streams[0].width} x ${videoInfo.streams[0].height}`
+    videoHxLDiv.append(videoHxLText);
+
+    let ExtDiv = document.createElement("div");
+    ExtDiv.classList.add("video-ext","video-info-block")
+    let ExtText = document.createElement("p");
+    ExtText.textContent = videoDetails.ext;
+    ExtDiv.append(ExtText)
+
+    let DisplayRatioDiv = document.createElement("div");
+    DisplayRatioDiv.classList.add("video-ratio", "video-info-block")
+    let DisplayRatioText = document.createElement("p");
+    DisplayRatioText.textContent = videoInfo.streams[0].display_aspect_ratio;
+    DisplayRatioDiv.append(DisplayRatioText)
+
+    let amountofStreamsDiv = document.createElement("div");
+    amountofStreamsDiv.classList.add("video-streams", "video-info-block")
+    let amountofStreamsText = document.createElement("p");
+    amountofStreamsText.textContent = videoInfo.streams.length;
+    amountofStreamsDiv.append(amountofStreamsText)
+    
+    let videoLengthDiv = document.createElement("div");
+    videoLengthDiv.classList.add("video-length", "video-info-block")
+    let videoLengthText = document.createElement("p");
+    videoLengthText.id = "video-duration"
+    videoLengthText.textContent = videoDetails.duration;
+    videoLengthDiv.append(videoLengthText)
+
+    let videoMemoryDiv = document.createElement("div");
+    videoMemoryDiv.classList.add("video-size", "video-info-block")
+    let videoMemoryText = document.createElement("p");
+    videoMemoryText.textContent = formatSize(videoDetails.size);
+    videoMemoryDiv.append(videoMemoryText)
+
+    videoInfoCard.append(nameDiv,videoHxLDiv,ExtDiv,DisplayRatioDiv,amountofStreamsDiv,videoLengthDiv,videoMemoryDiv)
+}
+
+
+function formatSize(bytes)
+{
+    if(bytes > 1073741824 )
+    {
+        let num = bytes/1073741824
+        return num.toFixed(2)  + " GB"
+    }
+    else if(bytes > 1048576)
+    {
+        let num = bytes/1048576
+        return num.toFixed(2)  + " MB"
+    }
+    else
+    {
+        let num =  bytes/1024
+        return num.toFixed(2) + " KB"
+    }
+}
+
+function formatTime(value)
+{
+    let time = value
+    let finished = false
+
+    let hours = 0
+    let mins = 0
+    let seconds = 0
+    while(!finished)
+    {
+        if(time > 3600)
+        {
+            console.log(time)
+            hours = Math.floor(time / 3600)
+            time = time - (hours * 3600)
+        }
+        else if(time > 60)
+        {
+            console.log(time)
+            mins = Math.floor(time / 60)
+            time = time - (mins * 60)
+        }
+        else
+        {
+            console.log(time)
+            seconds = Math.round(time)
+            finished = true
+        }
+    }
+
+    return `${hours < 10 ? "0"+hours : hours}:${mins < 10 ? "0"+mins : mins}:${seconds < 10 ? "0"+seconds : seconds}`
 }

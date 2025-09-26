@@ -39,6 +39,7 @@ export async function finishedUploadffprob(req, res){
   {
     await generationFile(fileInformation)
     let videoJson = getVideoInformation(`${fileInformation.name}.${fileInformation.ext}`)
+    console.log(typeof videoJson)
     removeVideo(`${fileInformation.name}.${fileInformation.ext}`)
     res.json(videoJson)
   }
