@@ -3,6 +3,7 @@ const submit = document.getElementById("submit");
 const locationForm = document.getElementById("locationForm");
 const form = document.getElementById("form");
 const formBlock = document.getElementById("generated-blocks-container");
+const uploadFileButton = document.getElementById("upload-button");
 
 let videoDetails = { duration:"", size:"", name:"", ext:""}
 let videoInfo = ""
@@ -11,19 +12,13 @@ const canvas = document.getElementById("canvas");
 let url = ""
 let filesCollection = []
 
-files.addEventListener("change",async (e) => {
- filesCollection = []
- filesCollection.push(chunkVideo(e.target.files[0]))
- await uploadFileForInfo(filesCollection[0])
- url = URL.createObjectURL(e.target.files[0])
- createScreenShot()
- videoDetails.name = e.target.files[0].name.split(".")[0];
- videoDetails.ext = e.target.files[0].name.split(".")[1];
- videoDetails.size = e.target.files[0].size;
- generateVideoInformationCard(e.target.files[0])
-})
+const loadingBG = document.getElementById("loading-bg");
+const loadingText = document.getElementById("loading-text");
+
+files.addEventListener("change", (e) => { handleUpload(e)})
 
 submit.addEventListener("click", (e) => {
+    console.log("clicked")
     e.preventDefault()
     upload(uploadPrep)
 })
@@ -37,6 +32,19 @@ async function upload(cb)
         count++
     }
 
+}
+
+async function handleUpload(e)
+{
+ filesCollection = []
+ filesCollection.push(chunkVideo(e.target.files[0]))
+ await uploadFileForInfo(filesCollection[0])
+ url = URL.createObjectURL(e.target.files[0])
+ createScreenShot()
+ videoDetails.name = e.target.files[0].name.split(".")[0];
+ videoDetails.ext = e.target.files[0].name.split(".")[1];
+ videoDetails.size = e.target.files[0].size;
+ generateVideoInformationCard(e.target.files[0])
 }
 
 async function uploadPrep(chunksObj)
@@ -114,6 +122,7 @@ async function uploadFetch(arrChunks)
 async function uploadFileForInfo(chunks)
 {
     try {
+        loading("Getting video information...")
         for([index, obj] of chunks.mediaChunks.entries())
         {
             let res =  await fetch("http://localhost:3003/upload/videochunks", {method:"POST", body:obj, headers: {'Content-Type': obj.type, 'Content-Length': obj.size.toString(), 'X-Original-Filename': obj.name.split(".")[0], 'X-Chunk-Number': index},duplex: 'half'})
@@ -126,6 +135,7 @@ async function uploadFileForInfo(chunks)
             generateFormParts()
             console.log(data);
             videoInfo = data;
+            loading()
         }
     } catch (error) {
         console.log(error)
@@ -169,6 +179,26 @@ function generateFormParts()
     formBlock.append(label2)
 }
 
+function generateVideoInput()
+{
+    //Plan out video block
+}
+
+function generateAudioInput()
+{
+     //Plan out audio block
+}
+
+function generateSubsInput()
+{
+     //Plan out subs block
+}
+
+function generateExtraInput()
+{
+     //Plan out extras block
+}
+
 function createScreenShot()
 {
     const video = document.createElement("video");
@@ -181,8 +211,6 @@ function createScreenShot()
         document.getElementById("video-duration").textContent = formatTime(video.duration);
         videoDetails.duration = video.duration;
         video.currentTime = 12;
-        
-        
     });
 
     video.addEventListener("seeked", () => {
@@ -304,3 +332,22 @@ function formatTime(value)
 
     return `${hours < 10 ? "0"+hours : hours}:${mins < 10 ? "0"+mins : mins}:${seconds < 10 ? "0"+seconds : seconds}`
 }
+
+
+function loading(text = "")
+{
+    if(loadingBG.classList.contains("hide"))
+    {
+        loadingText.textContent = text
+        loadingBG.classList.remove("hide")
+    }
+    else
+    {
+       loadingBG.classList.add("hide") 
+    }
+}
+
+uploadFileButton.addEventListener("click", (e) => {
+    e.preventDefault()
+    files.click()
+})

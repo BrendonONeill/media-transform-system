@@ -1,8 +1,4 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
 <html>
     <head>
         <meta charset="utf-8">
@@ -14,7 +10,21 @@
         <script src="js/main.js" async defer></script>
     </head>
     <body>
-        <h1>Video converter</h1>
+        <nav>
+            <h1>Video</h1>
+        </nav>
+        <main>
+            <div class="loading-bg hide" id="loading-bg">
+            <div class="loading-content">
+                <div class="loading-text-container">
+                    <p id="loading-text">loading</p>
+                </div>
+                <div class="loading-spinner-container">
+                    <img src="/img/spinner.svg" width="80" height="80" alt="">
+                </div>
+            </div>
+
+        </div>
         <div class="video-info-container">
             <div class="video-image">
                 <img id="screenshot" width="640" height="360" />
@@ -24,9 +34,8 @@
             </div>
         </div>
         <form enctype="multipart/form-data" id="form">
-            <label for="">
-                <input type="file" name="filesForm" multiple accept="video/* video/mkv"  id="filesForm">
-            </label>
+                <input type="file" name="filesForm" multiple accept="video/* video/mkv"  id="filesForm" hidden>
+            <button id="upload-button" class="upload-button"><img src="/img/upload.svg" width="20" height="20" alt=""> Upload File</button>
             <div id="generated-blocks-container">
 
             </div>
@@ -42,5 +51,9 @@
         <div>
             <canvas id="canvas" style="border:1px solid #000"></canvas>
         </div>
+        </main>
+        <footer>
+
+        </footer>
     </body>
 </html>

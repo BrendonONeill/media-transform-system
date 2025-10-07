@@ -9,6 +9,7 @@
 :root {
   --main-bg-colour: #0077b6;
   --main-bg-colour-dark: #03045e;
+  --main-bg-colour-lighter-dark: hsl(239, 80%, 30%);
   --sub-bg-colour: #caf0f8;
 }
 
@@ -16,12 +17,18 @@
 body
 {
     background-color: var(--sub-bg-colour);
+    
+}
+
+main
+{
     padding: 1rem;
 }
 
 img
 {
     max-width: 100%;
+    display: block;
 }
 
 
@@ -46,6 +53,30 @@ label
     padding: 0.3rem;
 }
 
+
+.upload-button
+{
+    background-color: var(--main-bg-colour-dark);
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    width: 115px;
+    height: 50px;
+    padding: 0.4rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.4rem;
+    align-items:center;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border: 2px solid var(--main-bg-colour);
+}
+
+.upload-button:hover
+{
+    border: 2px solid white;
+    background-color: var(--main-bg-colour-lighter-dark);
+}
 
 input[type=text]
 {
@@ -159,4 +190,70 @@ canvas
 {
     grid-column: 2/3;
     grid-row: 3/4;
+}
+
+
+.loading-bg
+{
+    background-color: rgba(0, 0, 0,0.8);
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-content{
+    
+    color: white;
+    width: 400px;
+    height: 280px;
+    border-radius: 5px;
+    display: grid;
+    grid-template-columns: repeat(3 1fr);
+    grid-template-rows: repeat(4 1fr);
+}
+
+.loading-text-container
+{
+    grid-row: 1/4;
+    grid-column: 1/4;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 0.4rem;
+}
+
+#loading-text
+{
+    font-size: 2rem;
+}
+
+.loading-spinner-container
+{
+    grid-row: 4/5;
+    grid-column: 2/3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+} 
+
+
+.hide
+{
+    display: none;
+}
+
+nav
+{
+    padding: 1rem;
+    background-color: #03045e;
+    color: white;
+}
+
+footer
+{
+    padding: 1rem;
+    background-color: #03045e;
+    color: white;
 }
