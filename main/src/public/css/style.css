@@ -8,7 +8,9 @@
 
 :root {
   --main-bg-colour: #0077b6;
+  --main-bg-light-colour: hsl(201, 100%, 40%);
   --main-bg-colour-dark: #03045e;
+  --main-bg-colour-dark-shade: hsl(201, 50%, 28%);
   --main-bg-colour-lighter-dark: hsl(239, 80%, 30%);
   --sub-bg-colour: #caf0f8;
 }
@@ -98,13 +100,12 @@ input[type=button]
 
 #generated-blocks-container
 {
-    background-color: var(--main-bg-colour);
     overflow-y: scroll;
-    max-height: 200px;
-    min-height: 200px;
+    max-height: 250px;
+    min-height: 250px;
     border-radius: 5px;
-    border: 2px solid var(--sub-bg-colour);
     padding: 0.3rem;
+    border: 3px solid #efefef;
 }
 
 canvas
@@ -124,6 +125,10 @@ canvas
 .video-image
 {
     grid-column: 1/2;
+    height: 360px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .video-info
@@ -147,6 +152,15 @@ canvas
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+}
+
+.info-label
+{
+    position: absolute;
+    top: 5px;
+    left: 10px;
+    font-size: 1rem;
 }
 
 .video-name
@@ -154,6 +168,7 @@ canvas
     grid-column: 1/3;
     grid-row: 1/2;
     justify-content: flex-start;
+    padding-inline: 4.8rem;
 }
 
 .video-hxl
@@ -236,7 +251,68 @@ canvas
     display: flex;
     align-items: center;
     justify-content: center;
-} 
+}
+
+.gen-div
+{
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0 1rem;
+    border-radius: 5px;
+}
+
+.gen-div-content
+{
+    background-color: var(--main-bg-colour);
+    padding: 0.4rem;
+    flex-basis: 33%;
+    border-radius: 5px;
+    height: 142px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0.2rem;
+}
+
+.outer-div
+{
+    display: flex;
+    flex-direction: column;
+    background-color: var(--main-bg-colour-dark-shade);
+    border-radius: 5px;
+}
+
+.gen-div-name
+{
+   padding: 1.2rem 1.0rem 0.4rem 1.0rem; 
+}
+
+.gen-div-name h3
+{
+    background-color: var(--main-bg-colour);
+    border-radius: 5px;
+    padding: 0.2rem 1rem;
+}
+
+.gen-div-content p
+{
+    padding: 0.4rem;
+}
+
+.gen-div label
+{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.disabled
+{
+    opacity: 0.5;
+}
 
 
 .hide

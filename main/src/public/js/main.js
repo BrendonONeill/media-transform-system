@@ -132,7 +132,7 @@ async function uploadFileForInfo(chunks)
         if(res.ok)
         {
             let data = await res.json()
-            generateFormParts()
+            generateFormParts(data.streams[0])
             console.log(data);
             videoInfo = data;
             loading()
@@ -165,28 +165,156 @@ function chunkVideo(file)
 }
 
 
-function generateFormParts()
+function generateFormParts(stream)
 {
-    let label = document.createElement("label");
-    label.append("testing")
-    let input = document.createElement("input");
-    label.append(input)
-    formBlock.append(label)
-    let label2 = document.createElement("label");
-    label2.append("testing")
-    let input2 = document.createElement("input");
-    label2.append(input2)
-    formBlock.append(label2)
+    generateVideoInput(stream)
 }
 
-function generateVideoInput()
+function generateVideoInput(videoStream)
 {
-    //Plan out video block
+     const outerDiv = document.createElement("div");
+     outerDiv.classList.add("outer-div")
+     const nameDiv = document.createElement("div");
+     nameDiv.innerHTML = `<h3>Stream 1: Video</h3>`;
+     nameDiv.classList.add("gen-div-name");
+     const videoDiv = document.createElement("div");
+     videoDiv.classList.add("gen-div")
+     const div1 = document.createElement("div"); 
+     const div2 = document.createElement("div"); 
+     const div3 = document.createElement("div");
+     div1.classList.add("gen-div-content"); 
+     div2.classList.add("gen-div-content"); 
+     div3.classList.add("gen-div-content");  
+     const extensionType = document.createElement("p");
+     const checkboxExtensionLabel = document.createElement("label")
+     const checkboxExtension = document.createElement("input")
+
+     const extensionDiv = document.createElement("div");
+     const extensionSelectLabel = document.createElement("label");
+     const extensionSelect = document.createElement("select");
+     console.log(filesCollection)
+     extensionType.textContent = `Extension: ${filesCollection[0].type.split("/")[1]}`;
+     
+     checkboxExtension.type = 'checkbox';
+     checkboxExtension.checked = true;
+     checkboxExtension.id = 'checkboxExtension';
+     checkboxExtensionLabel.append("keep Extension the same",checkboxExtension);
+
+      extensionSelect.innerHTML = 
+     `
+        <option value="mp4" selected>MP4</option>
+        <option value="mkv">MKV</option>
+        <option value="mov">MOV</option>
+     `
+     extensionSelect.disabled = true
+     extensionDiv.classList.add("disabled")
+     extensionSelectLabel.append("Extension: ",extensionSelect);
+     extensionDiv.append(extensionSelectLabel);
+
+     checkboxExtension.addEventListener("click", () => {
+        if(checkboxExtension.checked)
+        {
+            extensionSelect.disabled = true
+            extensionDiv.classList.add("disabled")
+        }
+        else
+        {
+            extensionSelect.disabled = false
+            extensionDiv.classList.remove("disabled")
+        }
+     })
+
+     const FPSType = document.createElement("p");
+     const checkboxFPSLabel = document.createElement("label")
+     const checkboxFPS = document.createElement("input")
+
+     const FPSDiv = document.createElement("div");
+     const FPSSelectLabel = document.createElement("label");
+     const FPSSelect = document.createElement("input");
+     FPSSelect.disabled = true
+
+     fpsScore = (Number(videoStream.r_frame_rate.split("/")[0]) / Number(videoStream.r_frame_rate.split("/")[1])).toFixed(2)
+     FPSType.textContent = `FPS: ${fpsScore}`;
+
+     checkboxFPS.type = 'checkbox';
+     checkboxFPS.checked = true;
+     checkboxFPS.id = 'checkboxFPS';
+     checkboxFPSLabel.append("keep FPS the same",checkboxFPS);
+
+     FPSSelect.type = "number";
+     FPSSelect.value = fpsScore;
+     FPSDiv.classList.add("disabled")
+     FPSSelectLabel.append("FPS: ", FPSSelect);
+     FPSDiv.append(FPSSelectLabel);
+
+     checkboxFPS.addEventListener("click", () => {
+        if(checkboxFPS.checked)
+        {
+            FPSSelect.disabled = true
+            FPSDiv.classList.add("disabled")
+        }
+        else
+        {
+            FPSSelect.disabled = false
+            FPSDiv.classList.remove("disabled")
+        }
+     })
+
+     const HxWType = document.createElement("p");
+     const checkboxHxWLabel = document.createElement("label")
+     const checkboxHxW = document.createElement("input")
+
+     const HxWDiv = document.createElement("div");
+     const HSelectLabel = document.createElement("label");
+     const WSelectLabel = document.createElement("label");
+     const HSelect = document.createElement("input");
+     const WSelect = document.createElement("input");
+
+     HxWType.textContent = `Dimensions: ${videoStream.coded_height}x${videoStream.coded_width}`;
+
+     checkboxHxW.type = 'checkbox';
+     checkboxHxW.checked = true;
+     checkboxHxW.id = 'checkboxHxW';
+     checkboxHxWLabel.append("Keep Height and Width the same ",checkboxHxW);
+
+     HSelect.type = "number";
+     WSelect.type = "number";
+     HSelect.value = videoStream.coded_height;
+     WSelect.value = videoStream.coded_width;
+
+     HSelect.disabled = true
+     WSelect.disabled = true
+
+     HSelectLabel.append("Height: ", HSelect);
+     WSelectLabel.append("Width: ", WSelect);
+     HxWDiv.classList.add("disabled")
+     HxWDiv.append(HSelectLabel,WSelectLabel);
+
+     checkboxHxW.addEventListener("click", () => {
+        if(checkboxHxW.checked)
+        {
+            HSelect.disabled = true
+            WSelect.disabled = true
+            HxWDiv.classList.add("disabled")
+        }
+        else
+        {
+            HSelect.disabled = false
+            WSelect.disabled = false
+            HxWDiv.classList.remove("disabled")
+        }
+     })
+     div1.append(extensionType, checkboxExtensionLabel, extensionDiv)
+     div2.append(FPSType, checkboxFPSLabel, FPSDiv)
+     div3.append(HxWType, checkboxHxWLabel, HxWDiv)
+     videoDiv.append(div1, div2, div3);
+     outerDiv.append(nameDiv, videoDiv)
+     formBlock.append(outerDiv);
 }
 
 function generateAudioInput()
 {
-     //Plan out audio block
+    //Audio 
 }
 
 function generateSubsInput()
@@ -235,47 +363,68 @@ function generateVideoInformationCard(file)
     let nameDiv = document.createElement("div")
     nameDiv.classList.add("video-name","video-info-block")
     let nameText = document.createElement("p");
+    let nameLabel = document.createElement("p");
+    nameLabel.textContent = "Name:"
+    nameLabel.classList.add("info-label")
     nameText.textContent = videoDetails.name;
-    nameDiv.append(nameText)
+    nameDiv.append(nameText,nameLabel)
 
 
     //size
     let videoHxLDiv = document.createElement("div");
     videoHxLDiv.classList.add("video-hxl", "video-info-block")
     let videoHxLText = document.createElement("p");
+    let videoHxLLabel = document.createElement("p");
+    videoHxLLabel.textContent = "Dimensions:"
+    videoHxLLabel.classList.add("info-label")
     videoHxLText.textContent = `${videoInfo.streams[0].width} x ${videoInfo.streams[0].height}`
-    videoHxLDiv.append(videoHxLText);
+    videoHxLDiv.append(videoHxLText,videoHxLLabel);
 
     let ExtDiv = document.createElement("div");
     ExtDiv.classList.add("video-ext","video-info-block")
     let ExtText = document.createElement("p");
+    let ExtLabel = document.createElement("p");
+    ExtLabel.textContent = "Extension:"
+    ExtLabel.classList.add("info-label")
     ExtText.textContent = videoDetails.ext;
-    ExtDiv.append(ExtText)
+    ExtDiv.append(ExtText,ExtLabel)
 
     let DisplayRatioDiv = document.createElement("div");
     DisplayRatioDiv.classList.add("video-ratio", "video-info-block")
     let DisplayRatioText = document.createElement("p");
+    let DisplayRatioLabel = document.createElement("p");
+    DisplayRatioLabel.textContent = "Aspect Ratio:"
+    DisplayRatioLabel.classList.add("info-label")
     DisplayRatioText.textContent = videoInfo.streams[0].display_aspect_ratio;
-    DisplayRatioDiv.append(DisplayRatioText)
+    DisplayRatioDiv.append(DisplayRatioText, DisplayRatioLabel)
 
     let amountofStreamsDiv = document.createElement("div");
     amountofStreamsDiv.classList.add("video-streams", "video-info-block")
     let amountofStreamsText = document.createElement("p");
+    let amountofStreamsLabel = document.createElement("p");
+    amountofStreamsLabel.textContent = "Streams:"
+    amountofStreamsLabel.classList.add("info-label")
     amountofStreamsText.textContent = videoInfo.streams.length;
-    amountofStreamsDiv.append(amountofStreamsText)
+    amountofStreamsDiv.append(amountofStreamsText,amountofStreamsLabel)
     
     let videoLengthDiv = document.createElement("div");
     videoLengthDiv.classList.add("video-length", "video-info-block")
     let videoLengthText = document.createElement("p");
+    let videoLengthLabel = document.createElement("p");
     videoLengthText.id = "video-duration"
+    videoLengthLabel.textContent = "Duration:"
+    videoLengthLabel.classList.add("info-label")
     videoLengthText.textContent = videoDetails.duration;
-    videoLengthDiv.append(videoLengthText)
+    videoLengthDiv.append(videoLengthText, videoLengthLabel)
 
     let videoMemoryDiv = document.createElement("div");
     videoMemoryDiv.classList.add("video-size", "video-info-block")
     let videoMemoryText = document.createElement("p");
+    let videoMemoryLabel = document.createElement("p");
+    videoMemoryLabel.textContent = "Size:"
+    videoMemoryLabel.classList.add("info-label")
     videoMemoryText.textContent = formatSize(videoDetails.size);
-    videoMemoryDiv.append(videoMemoryText)
+    videoMemoryDiv.append(videoMemoryText,videoMemoryLabel)
 
     videoInfoCard.append(nameDiv,videoHxLDiv,ExtDiv,DisplayRatioDiv,amountofStreamsDiv,videoLengthDiv,videoMemoryDiv)
 }
