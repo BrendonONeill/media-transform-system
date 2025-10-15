@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
 *,*::after,*::before
 {
     margin: 0;
@@ -9,17 +11,18 @@
 :root {
   --main-bg-colour: #0077b6;
   --main-bg-light-colour: hsl(201, 100%, 40%);
-  --main-bg-colour-dark: #03045e;
-  --main-bg-colour-dark-shade: hsl(201, 50%, 28%);
-  --main-bg-colour-lighter-dark: hsl(239, 80%, 30%);
+  --main-bg-colour-dark: #003b5b;
+  --main-bg-colour-dark-shade: #005f91;
+  --main-bg-colour-lighter-dark: #00537f;
   --sub-bg-colour: #caf0f8;
+  --dark-shade-white: #e5e5e5;
 }
 
 
 body
 {
-    background-color: var(--sub-bg-colour);
-    
+    background-color: var(--dark-shade-white);
+    font-family: "Roboto", sans-serif;
 }
 
 main
@@ -113,13 +116,18 @@ canvas
     display: none;
 }
 
+#screenshot
+{
+ border-radius: 5px;
+}
 
 .video-info-container
 {
     display: grid;
     grid-template-columns: 1fr 2fr;
     padding: 1rem;
-    background-color: #efefef;
+    background-color: white;
+    border-radius: 5px 5px 0 0;
 }
 
 .video-image
@@ -143,7 +151,7 @@ canvas
 
 .video-info-block
 {
-    background-color: var(--main-bg-colour);
+    background-color: var(--main-bg-colour-dark-shade);
     color: white;
     border-radius: 5px;
     padding: 1rem;
@@ -323,13 +331,13 @@ canvas
 nav
 {
     padding: 1rem;
-    background-color: #03045e;
+    background-color: var(--main-bg-colour-dark);
     color: white;
 }
 
 footer
 {
     padding: 1rem;
-    background-color: #03045e;
+    background-color: var(--main-bg-colour-dark);
     color: white;
 }

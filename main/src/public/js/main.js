@@ -198,7 +198,7 @@ function generateVideoInput(videoStream)
      checkboxExtension.type = 'checkbox';
      checkboxExtension.checked = true;
      checkboxExtension.id = 'checkboxExtension';
-     checkboxExtensionLabel.append("keep Extension the same",checkboxExtension);
+     checkboxExtensionLabel.append("Keep Extension the same",checkboxExtension);
 
       extensionSelect.innerHTML = 
      `
@@ -239,7 +239,7 @@ function generateVideoInput(videoStream)
      checkboxFPS.type = 'checkbox';
      checkboxFPS.checked = true;
      checkboxFPS.id = 'checkboxFPS';
-     checkboxFPSLabel.append("keep FPS the same",checkboxFPS);
+     checkboxFPSLabel.append("Keep FPS the same",checkboxFPS);
 
      FPSSelect.type = "number";
      FPSSelect.value = fpsScore;
