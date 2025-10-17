@@ -7,7 +7,7 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="css/style.css">
-        <script src="js/main.js" async defer></script>
+        <script type="module" src="js/main.js" async defer></script>
     </head>
     <body>
         <nav>
@@ -27,12 +27,42 @@
         </div>
         <div class="video-info-container">
             <div class="video-image">
-                <img id="screenshot" width="640" />
+                <img src="" width="640" id="screenshot" alt="">
             </div>
             <div class="video-info">
                 
+            <div class="video-name video-info-block">
+                <p class="video-name-p"></p>
+                <p class="info-label">Name:</p>
+            </div>
+            <div class="video-hxl video-info-block">
+                <p class="video-hxl-p"></p>
+                <p class="info-label">Dimensions:</p>
+            </div>
+            <div class="video-ext video-info-block">
+                <p class="video-ext-p"></p>
+                <p class="info-label">Extension:</p>
+            </div>
+            <div class="video-ratio video-info-block">
+                <p class="video-ratio-p"></p>
+                <p class="info-label">Aspect Ratio:</p>
+            </div>
+            <div class="video-streams video-info-block">
+                <p class="video-streams-p"></p>
+                <p class="info-label">Streams:</p>
+            </div>
+            <div class="video-length video-info-block">
+                <p id="video-duration" class="video-length-p"></p>
+                <p class="info-label">Duration:</p>
+            </div>
+            <div class="video-size video-info-block">
+                <p class="video-size-p"></p>
+                <p class="info-label">Size:</p>
             </div>
         </div>
+        </div>
+
+
         <form enctype="multipart/form-data" id="form">
                 <input type="file" name="filesForm" multiple accept="video/* video/mkv"  id="filesForm" hidden>
             <button id="upload-button" class="upload-button"><img src="/img/upload.svg" width="20" height="20" alt=""> Upload File</button>
