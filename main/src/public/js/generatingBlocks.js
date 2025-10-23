@@ -1,6 +1,7 @@
 import { videoDetails} from "./main.js";
 import { videoInfo } from "./sendToFFPROBE.js";
 
+
 const videoNameBlockText = document.querySelector(".video-name-p");
 const videoExtBlockText = document.querySelector(".video-ext-p");
 const videoDimensionsBlockText = document.querySelector(".video-hxl-p");
@@ -9,7 +10,11 @@ const videoStreamsBlockText = document.querySelector(".video-streams-p");
 const videoDurationBlockText = document.querySelector(".video-length-p");
 const videoSizeBlockText = document.querySelector(".video-size-p");
 const videoImageBlock = document.querySelector(".video-image");
+const allSelectionButton = document.querySelector(".all-selection")
 
+let selectedCheckBoxs = ""
+
+allSelectionButton.addEventListener("click", (e) => selectedCheckBoxsHandler(e))
 
 
 const formBlock = document.getElementById("generated-blocks-container");
@@ -46,16 +51,39 @@ export function generateVideoInformationCard(file)
 
 export function generateFormParts(streams,file)
 {
-    generateVideoInput(streams[0],file)
-    generateAudioInput(streams[1])
+    for(let i = 0; i < streams.length; i++)
+    {
+        let codecType = streams[i].codec_type
+        if(codecType === "video")
+        {
+            generateVideoInput(streams[i],file,i)
+        }
+        if(codecType === "audio")
+        {
+            generateAudioInput(streams[1],i)
+        }
+        if(codecType === "subtitle")
+        {
+            generateSubsInput(streams[i],i)
+        }
+        if(codecType === "attachment")
+        {
+            generateExtraInput(streams[i],i)
+        }
+    }
+    selectedCheckBoxs = document.querySelectorAll(".selectedStream")    
 }
 
-function generateBlockForStream(type,index,)
+function generateBlockForStream(type,index)
 {
      const outerDiv = document.createElement("div");
      outerDiv.classList.add("outer-div")
      const nameDiv = document.createElement("div");
-     nameDiv.innerHTML = `<h3>Stream ${index}: ${type}</h3>`;
+     const nameDivName = document.createElement("h3");
+     nameDivName.textContent = `Stream ${index}: ${type}`;
+     const namDivLabel = document.createElement("label");
+     namDivLabel.innerHTML = `selected <input class="selectedStream" type="checkbox" checked></input>`
+     nameDiv.append(nameDivName, namDivLabel);
      nameDiv.classList.add("gen-div-name");
 
      const ContentDiv = document.createElement("div");
@@ -73,9 +101,9 @@ function generateBlockForStream(type,index,)
 }
 
 
-function generateVideoInput(videoStream, videoFileInfo)
+function generateVideoInput(videoStream, videoFileInfo,index)
 {
-     const outerDiv = generateBlockForStream("Video",0)
+     const outerDiv = generateBlockForStream("Video",index)
 
      const extensionType = document.createElement("p");
      const checkboxExtensionLabel = document.createElement("label")
@@ -204,57 +232,56 @@ function generateVideoInput(videoStream, videoFileInfo)
 }
 
 
-export function generateAudioInput(audioStream)
+export function generateAudioInput(audioStream,index)
 {
-     const outerDiv = generateBlockForStream("Audio",1);
+     const outerDiv = generateBlockForStream("Audio",index);
 
-     const bitRateType = document.createElement("p");
-     const checkboxbitRateLabel = document.createElement("label")
-     const checkboxbitRate = document.createElement("input")
+     const channels = document.createElement("p");
+     const checkboxChannelsLabel = document.createElement("label");
+     const checkboxChannels = document.createElement("input");
 
-     const bitRateDiv = document.createElement("div");
-     const bitRateSelectLabel = document.createElement("label");
-     const bitRateSelect = document.createElement("input");
-     bitRateSelect.disabled = true
+     channels.textContent = `Channels: ${audioStream.channel_layout}`
 
-     bitRateType.textContent = `Bit-Rate: ${audioStream.bit_rate}`;
+     checkboxChannels.type = 'checkbox';
+     checkboxChannels.checked = true;
+     checkboxChannels.id = 'checkboxChannels';
+     checkboxChannelsLabel.append("Keep Channels the same",checkboxChannels);
 
-     checkboxbitRate.type = 'checkbox';
-     checkboxbitRate.checked = true;
-     checkboxbitRate.id = 'checkboxbitRate';
-     checkboxbitRateLabel.append("Keep bit rate the same",checkboxbitRate);
+     const tags = document.createElement("h3");
+     const tagsLang = document.createElement("p");
+     tags.textContent = "Tags:"
+     tagsLang.textContent = `Language: ${audioStream.tags.language}`
 
-     bitRateSelect.type = "number";
-     bitRateSelect.value = audioStream.bit_rate;
-     bitRateDiv.classList.add("disabled")
-     bitRateSelectLabel.append("Bit-Rate: ", bitRateSelect);
-     bitRateDiv.append(bitRateSelectLabel);
 
-     checkboxbitRate.addEventListener("click", () => {
-        if(checkboxbitRate.checked)
-        {
-            bitRateSelect.disabled = true
-            bitRateDiv.classList.add("disabled")
-        }
-        else
-        {
-            bitRateSelect.disabled = false
-            bitRateDiv.classList.remove("disabled")
-        }
-     })
-
-     outerDiv.querySelector(".content-1").append(bitRateType, checkboxbitRateLabel, bitRateDiv);
+     outerDiv.querySelector(".content-1").append(channels,checkboxChannelsLabel);
+     outerDiv.querySelector(".content-3").append(tags,tagsLang)
      formBlock.append(outerDiv);
 }
 
-export function generateSubsInput()
+export function generateSubsInput(subtitleStream,index)
 {
-     //Plan out subs block
+     const outerDiv = generateBlockForStream("Subtitle",index);
+
+     const subtitleType = document.createElement("p");
+     const subtitleFullNameType = document.createElement("p");
+     subtitleType.textContent = `Codec name: ${subtitleStream.codec_name}`
+     subtitleFullNameType.textContent = `Codec fullname: ${subtitleStream.codec_long_name}`
+
+     const tags = document.createElement("h3");
+     const tagsLang = document.createElement("p");
+     tags.textContent = "Tags:"
+     tagsLang.textContent = `Language: ${subtitleStream.tags.language}`
+
+     outerDiv.querySelector(".content-2").append(subtitleType,subtitleFullNameType)
+     outerDiv.querySelector(".content-3").append(tags,tagsLang)
+
+     formBlock.append(outerDiv);
 }
 
-export function generateExtraInput()
+export function generateExtraInput(attachmentStream,index)
 {
-     //Plan out extras block
+     const outerDiv = generateBlockForStream("Attachment",index);
+     formBlock.append(outerDiv);
 }
 
 
@@ -276,4 +303,27 @@ export function formatSize(bytes)
         let num =  bytes/1024
         return num.toFixed(2) + " KB"
     }
+}
+
+function selectedCheckBoxsHandler(eve)
+{
+   eve.preventDefault()
+   if(selectedCheckBoxs !== "")
+   {
+    if(allSelectionButton.textContent == "Deselect All")
+    {
+        allSelectionButton.textContent = "Select All"
+        selectedCheckBoxs.forEach((checkbox) => (
+        checkbox.checked = false
+        ))
+    }
+    else
+    {
+        allSelectionButton.textContent = "Deselect All"
+        selectedCheckBoxs.forEach((checkbox) => (
+        checkbox.checked = true
+    ))
+    }
+    
+   }
 }

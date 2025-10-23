@@ -268,6 +268,23 @@ canvas
     justify-content: center;
 }
 
+.streams-selecting-button-div
+{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0.4rem;
+}
+
+.streams-selecting-button-div button
+{
+    width: 100px;
+    height: 40px;
+    border-radius: 5px;
+    background-color: var(--main-bg-colour-dark);
+    color: white;
+}
+
 .gen-div
 {
     padding: 1rem;
@@ -302,7 +319,9 @@ canvas
 
 .gen-div-name
 {
-   padding: 1.2rem 1.0rem 0.4rem 1.0rem; 
+   padding: 1.2rem 1.0rem 0.4rem 1.0rem;
+   display: flex;
+   column-gap: 1rem; 
 }
 
 .gen-div-name h3
@@ -310,6 +329,19 @@ canvas
     background-color: var(--main-bg-colour);
     border-radius: 5px;
     padding: 0.2rem 1rem;
+    flex-basis: 90%;
+}
+
+.gen-div-name label
+{
+    background-color: var(--main-bg-colour);
+    border-radius: 5px;
+    padding: 0.2rem 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-basis: 10%;
 }
 
 .gen-div-content p

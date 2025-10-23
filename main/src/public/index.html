@@ -66,11 +66,17 @@
         <form enctype="multipart/form-data" id="form">
                 <input type="file" name="filesForm" multiple accept="video/* video/mkv"  id="filesForm" hidden>
             <button id="upload-button" class="upload-button"><img src="/img/upload.svg" width="20" height="20" alt=""> Upload File</button>
+            <div class="streams-selecting-button-div">
+                <button class="all-selection">Deselect All</button>
+            </div>
             <div id="generated-blocks-container">
 
             </div>
             <label for="locationForm">Location:
                 <input type="text" name="locationForm" id="locationForm">
+            </label>
+            <label for="locationForm">Name:
+                <input type="text" name="nameForm" id="nameForm">
             </label>
             <div>
                 <p>Command:</p>
