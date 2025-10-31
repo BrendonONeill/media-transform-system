@@ -19,6 +19,7 @@ export function videoAddTask(fileName)
   if(!active)
   {
     active = true
+    //Add command building for ffmpeg
     videoWork()
     active = false
   }

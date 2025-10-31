@@ -3,6 +3,8 @@ import cors from 'cors';
 import VideoChunkingRouter from '../routes/fileUpload/routes.js'
 import videoInfoRouter from '../routes/fileInformation/routes.js'
 
+export const VideoMetaData = new Map()
+
 const app = Express()
 app.use(Express.json());
 app.use(Express.urlencoded({ extended: true }));

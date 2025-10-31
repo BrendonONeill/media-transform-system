@@ -1,3 +1,4 @@
+import { streamsArrayUpdate, streamsArrayUpdateAll, videoFormInformation } from "./command.js";
 import { videoDetails} from "./main.js";
 import { videoInfo } from "./sendToFFPROBE.js";
 
@@ -51,6 +52,7 @@ export function generateVideoInformationCard(file)
 
 export function generateFormParts(streams,file)
 {
+    streamsArrayUpdate(streams)
     for(let i = 0; i < streams.length; i++)
     {
         let codecType = streams[i].codec_type
@@ -71,18 +73,20 @@ export function generateFormParts(streams,file)
             generateExtraInput(streams[i],i)
         }
     }
-    selectedCheckBoxs = document.querySelectorAll(".selectedStream")    
+    selectedCheckBoxs = document.querySelectorAll(".selectedStream")
+    addActionOnCheckbox()    
 }
 
 function generateBlockForStream(type,index)
 {
      const outerDiv = document.createElement("div");
      outerDiv.classList.add("outer-div")
+     outerDiv.dataset.stream = index;
      const nameDiv = document.createElement("div");
      const nameDivName = document.createElement("h3");
      nameDivName.textContent = `Stream ${index}: ${type}`;
      const namDivLabel = document.createElement("label");
-     namDivLabel.innerHTML = `selected <input class="selectedStream" type="checkbox" checked></input>`
+     namDivLabel.innerHTML = `selected <input class="selectedStream" data-stream=${index} type="checkbox" checked></input>`
      nameDiv.append(nameDivName, namDivLabel);
      nameDiv.classList.add("gen-div-name");
 
@@ -313,17 +317,47 @@ function selectedCheckBoxsHandler(eve)
     if(allSelectionButton.textContent == "Deselect All")
     {
         allSelectionButton.textContent = "Select All"
-        selectedCheckBoxs.forEach((checkbox) => (
+        selectedCheckBoxs.forEach((checkbox) => {
+        streamsArrayUpdateAll(false);
         checkbox.checked = false
-        ))
+    })
     }
     else
     {
         allSelectionButton.textContent = "Deselect All"
-        selectedCheckBoxs.forEach((checkbox) => (
-        checkbox.checked = true
-    ))
+        selectedCheckBoxs.forEach((checkbox) => {
+        streamsArrayUpdateAll(true);
+        checkbox.checked = true;
+    })
     }
     
    }
+}
+
+
+export function streamBlocksReset()
+{
+    formBlock.innerHTML = "";
+}
+
+function addActionOnCheckbox()
+{
+    selectedCheckBoxs.forEach((checkbox) => {
+        checkbox.addEventListener("change", () => {
+            console.log(checkbox)
+            let index = checkbox.dataset.stream;
+            if(checkbox.checked)
+            {
+                console.log(videoFormInformation.streamArrayInformation[index]);
+                videoFormInformation.streamArrayInformation[index].selected = true;
+            }
+            else
+            {
+                console.log(videoFormInformation.streamArrayInformation[index]);
+                videoFormInformation.streamArrayInformation[index].selected = false;
+            }
+            console.log(videoFormInformation.streamArrayInformation)
+        })
+
+    })
 }

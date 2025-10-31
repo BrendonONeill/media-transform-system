@@ -1,6 +1,7 @@
 import fs from "node:fs"
 import { buffer } from 'stream/consumers';
 import { Blob } from 'buffer';
+import { VideoMetaData } from "../src/ffmpeg";
 
 export  async function generationFile(videoInformation)
 {
@@ -31,12 +32,13 @@ export  async function generationFile(videoInformation)
                 
                 readStream.on('error', (err) => {
                     console.log(err)
-                    reject
+                    reject();
                 });
             });
             
             i++;
         }
+        VideoMetaData.set(videoInformation.name,videoInformation.commandInfo);
         removeChunks(videoInformation.chunks,videoInformation.name)
         
 
@@ -90,7 +92,11 @@ export function removeVideo(name)
                 
                 console.log(`No more files found at ./temp/${name}`);
             }
-            fs.rmSync(filename)
+            else
+            {
+                fs.rmSync(filename)
+            }
+            
 }
 
 function removeChunks(chunks,name)

@@ -1,6 +1,8 @@
 
 import { uploadFileForInfo} from "./sendToFFPROBE.js";
-import { generateVideoInformationCard } from "./generatingBlocks.js";
+import { generateVideoInformationCard, streamBlocksReset } from "./generatingBlocks.js";
+import { upload, uploadPrep } from "./sendToFFMPEG.js";
+import "./command.js";
 
 const files = document.getElementById("filesForm");
 const submit = document.getElementById("submit");
@@ -14,31 +16,20 @@ const canvas = document.getElementById("canvas");
 let url = ""
 let filesCollection = []
 
-
-
 files.addEventListener("change", (e) => { handleUpload(e)})
 
 submit.addEventListener("click", (e) => {
     console.log("clicked")
     e.preventDefault()
-    upload(uploadPrep)
+    upload(filesCollection,uploadPrep)
 })
 
-async function upload(cb)
-{
-    let count = 0 
-    while(count <= filesCollection.length - 1)
-    {
-        cb(filesCollection[count])
-        count++
-    }
-
-}
 
 async function handleUpload(e)
 {
  filesCollection = []
  filesCollection.push(chunkVideo(e.target.files[0]))
+ streamBlocksReset()
  await uploadFileForInfo(filesCollection[0])
  url = URL.createObjectURL(e.target.files[0])
  createScreenShot()
@@ -47,80 +38,6 @@ async function handleUpload(e)
  videoDetails.size = e.target.files[0].size;
  generateVideoInformationCard(e.target.files[0])
 }
-
-async function uploadPrep(chunksObj)
-{ 
-    let chunks = chunksObj.numberOfChunks - 1
-    let chunksObjArr = chunksObj.mediaChunks
-    let count = 0
-    let arrChunks = []
-    while(count <= chunks)
-    {
-        if(arrChunks.length < 3)
-        {
-            arrChunks.push({chunk:chunksObjArr[count],id:count})
-            count++
-        }
-        else
-        {
-            arrChunks = await uploadFetch(arrChunks) 
-        }
-        
-    }
-    if(arrChunks.length > 0)
-    {
-        arrChunks = uploadFetch(arrChunks)
-    }
-    try {
-        let res = await fetch("http://localhost:3003/upload/finishedupload", {method:"POST", body:JSON.stringify({name: chunksObj.name.split(".")[0], ext: chunksObj.name.split(".")[1],chunks:chunks}), headers: {'Content-Type': 'application/json'}})
-        if(res.ok)
-        {
-            
-        }
-        else
-        {
-            throw new Error("failed to upload")
-        }
-    } catch (error) {
-        console.error(error)
-    }
-
-    try {
-        let res = await fetch("http://localhost:3000/return/setlocation", {method:"POST", body:JSON.stringify({name: chunksObj.name, location: locationForm.value}), headers: {'Content-Type': 'application/json'}})
-        if(res.ok)
-        {
-            return
-        }
-        else
-        {
-            throw new Error("failed to upload")
-        }
-    } catch (error) {
-        console.error(error)
-    }
-}
-
-async function uploadFetch(arrChunks)
-{
-    try {
-        let taskPromises = []
-        
-        for (const obj of arrChunks) {
-        const promise = fetch("http://localhost:3003/upload/videochunks", {method:"POST", body:obj.chunk, headers: {'Content-Type': obj.chunk.type, 'Content-Length': obj.chunk.size.toString(), 'X-Original-Filename': obj.chunk.name.split(".")[0], 'X-Chunk-Number': obj.id},duplex: 'half'})
-        taskPromises.push(promise);
-        }
-
-        const results = await Promise.all(taskPromises);
-        console.log(results)
-        return []
-        
-    } catch (error) {
-        console.log(error)
-    }
-    
-}
-
-
 
 function chunkVideo(file)
 {
@@ -143,9 +60,6 @@ function chunkVideo(file)
      }
     return {mediaChunks: mediaChunks, type: file.type, name: file.name, numberOfChunks: id, size: file.size}
 }
-
-
-
 
 
 function createScreenShot()
@@ -176,10 +90,6 @@ function createScreenShot()
           // cleanup blob URL if you won’t reuse
           URL.revokeObjectURL(url);})
 }
-
-
-
-
 
 
 function formatTime(value)
