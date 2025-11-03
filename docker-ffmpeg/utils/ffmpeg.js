@@ -1,25 +1,25 @@
 import { spawnSync } from 'child_process';
 import { EventEmitter } from 'node:events';
 import fs from "node:fs"
+import { VideoMetaData } from '../src/ffmpeg.js';
 const videoEmitter = new EventEmitter();
 const videoList = []
 let active = false
 
 videoEmitter.on('add', videoAddTask);
 
-export async  function main(fileName)
+export async  function main(fileName, id)
 {
  console.log("Starting ffmpeg process")
- videoEmitter.emit('add', fileName)
+ videoEmitter.emit('add', {fileName,id})
 }
 
-export function videoAddTask(fileName)
+export function videoAddTask(fileObject)
 {
-  videoList.push(fileName)
+  videoList.push(fileObject)
   if(!active)
   {
     active = true
-    //Add command building for ffmpeg
     videoWork()
     active = false
   }
@@ -33,18 +33,19 @@ function videoWork()
 {
     while(videoList.length >= 1)
     {
-        ffmpegAction(videoList[0])
-        fs.rmSync(`temp/${videoList[0]}`)
+        let command = buildCommand(videoList[0].id,videoList[0].fileName)
+        ffmpegAction(videoList[0].fileName, command)
+        //fs.rmSync(`temp/${videoList[0].fileName}`)
         videoList.shift()
     }
     return 
 }
 
 
-function ffmpegAction(file)
+function ffmpegAction(file, command)
 {
-    console.log(videoList[0], ' is getting converted')
-    const results = spawnSync('ffmpeg',['-i', `temp/${file}`, '-map', '0:0', '-map', '0:1', '-c', 'copy', `temp/new${file}`],{})
+    console.log(file, ' is getting converted')
+    const results = spawnSync('ffmpeg',command,{})
 
     if (results.error) {
         throw new Error(`FFmpeg spawn error: ${results.error.message}`);
@@ -60,4 +61,19 @@ function ffmpegAction(file)
 }
 
 
-
+function buildCommand(id,file)
+{
+  let command = `-i temp/${file} `; 
+  console.log(id)
+  let fileObject = VideoMetaData.get(id);
+  let removedStreams = fileObject.streamArrayInformation.filter((stream) => (stream.selected === false))
+  if(removedStreams.length > 0)
+  {
+    console.log("Removed streams", removedStreams)
+  }
+  console.log("after removing streams")
+  let fileName = fileObject.fileName !== "" ? fileObject.fileName : fileObject.oldFileName 
+  command += `-c copy temp/new${fileName}.${fileObject.ext}`
+  const commandArray = command.split(" ");   
+  return commandArray
+}

@@ -1,7 +1,7 @@
 import fs from "node:fs"
 import { buffer } from 'stream/consumers';
 import { Blob } from 'buffer';
-import { VideoMetaData } from "../src/ffmpeg";
+import { VideoMetaData } from "../src/ffmpeg.js";
 
 export  async function generationFile(videoInformation)
 {
@@ -26,7 +26,7 @@ export  async function generationFile(videoInformation)
                 });
                 
                 readStream.on('end', () => {
-                    console.log(`Streamed: ${filename}`);
+                    //console.log(`Streamed: ${filename}`);
                     resolve();
                 });
                 
@@ -56,7 +56,7 @@ export async function chunkCheck(fileInfo)
     let i = 0
     while(i < fileAmount)
     {
-        console.log("checking... ", i)
+        //console.log("checking... ", i)
         if(delayCount > 0)
         {
             await wait(delayAmount[delayCount]);

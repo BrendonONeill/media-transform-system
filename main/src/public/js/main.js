@@ -4,26 +4,23 @@ import { generateVideoInformationCard, streamBlocksReset } from "./generatingBlo
 import { upload, uploadPrep } from "./sendToFFMPEG.js";
 import "./command.js";
 
+export const videoDetails = { duration:"", size:"", name:"", ext:""}
+export const videoInfoCard = document.querySelector(".video-info");
 const files = document.getElementById("filesForm");
 const submit = document.getElementById("submit");
-const locationForm = document.getElementById("locationForm");
-const form = document.getElementById("form");
-const formBlock = document.getElementById("generated-blocks-container");
 const uploadFileButton = document.getElementById("upload-button");
-export let videoDetails = { duration:"", size:"", name:"", ext:""}
-export let videoInfoCard = document.querySelector(".video-info");
 const canvas = document.getElementById("canvas");
 let url = ""
 let filesCollection = []
 
+// Handles getting video information
+
 files.addEventListener("change", (e) => { handleUpload(e)})
 
-submit.addEventListener("click", (e) => {
-    console.log("clicked")
+uploadFileButton.addEventListener("click", (e) => {
     e.preventDefault()
-    upload(filesCollection,uploadPrep)
+    files.click()
 })
-
 
 async function handleUpload(e)
 {
@@ -39,6 +36,15 @@ async function handleUpload(e)
  generateVideoInformationCard(e.target.files[0])
 }
 
+// Handles getting video Upload
+submit.addEventListener("click", (e) => {
+    console.log("clicked")
+    e.preventDefault()
+    upload(filesCollection,uploadPrep)
+})
+
+
+// Chunking video for uploading
 function chunkVideo(file)
 {
     let mediaChunks = []
@@ -61,13 +67,13 @@ function chunkVideo(file)
     return {mediaChunks: mediaChunks, type: file.type, name: file.name, numberOfChunks: id, size: file.size}
 }
 
-
+// Create image from video uploaded
 function createScreenShot()
 {
     const video = document.createElement("video");
     video.src = url;
     video.load();
-    video.muted = true; // avoid autoplay blocking
+    video.muted = true;
     video.playsInline = true;
 
     video.addEventListener("loadedmetadata", () => {
@@ -80,18 +86,12 @@ function createScreenShot()
           const ctx = canvas.getContext("2d");
           canvas.width = video.videoWidth;
           canvas.height = video.videoHeight;
-
-          // draw current frame into canvas
           ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-
-          // export as image
           screenshot.src = canvas.toDataURL("image/png");
-
-          // cleanup blob URL if you won’t reuse
           URL.revokeObjectURL(url);})
 }
 
-
+// Handling video time format 
 function formatTime(value)
 {
     let time = value
@@ -128,7 +128,3 @@ function formatTime(value)
 
 
 
-uploadFileButton.addEventListener("click", (e) => {
-    e.preventDefault()
-    files.click()
-})

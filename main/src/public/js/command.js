@@ -7,9 +7,9 @@ export let videoFormInformation =
 {
  location: "",
  streamArrayInformation: [],
- streamArrayString: "", 
+ ext:"",
+ oldFileName: "", 
  fileName: "",
-
 }
 
 
@@ -19,12 +19,12 @@ locationInput.addEventListener("change", (e) => {
 })
 
 nameInput.addEventListener("change", (e) => {
-    videoFormInformation.name = e.target.value.trim();
+    videoFormInformation.fileName = e.target.value.trim();
     console.log("Updated: " +videoFormInformation.fileName)
 })
 
 
-
+// Set up streamArrayInformation
 export function streamsArrayUpdate(streams)
 {
     let streamsLen = streams.length;
@@ -36,6 +36,7 @@ export function streamsArrayUpdate(streams)
     console.log(videoFormInformation.streamArrayInformation)
 }
 
+// Change all values within streamArrayInformation
 export function streamsArrayUpdateAll(value)
 {
     for(let i = 0; i < videoFormInformation.streamArrayInformation.length; i++)

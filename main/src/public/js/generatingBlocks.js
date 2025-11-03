@@ -2,7 +2,6 @@ import { streamsArrayUpdate, streamsArrayUpdateAll, videoFormInformation } from 
 import { videoDetails} from "./main.js";
 import { videoInfo } from "./sendToFFPROBE.js";
 
-
 const videoNameBlockText = document.querySelector(".video-name-p");
 const videoExtBlockText = document.querySelector(".video-ext-p");
 const videoDimensionsBlockText = document.querySelector(".video-hxl-p");
@@ -62,7 +61,7 @@ export function generateFormParts(streams,file)
         }
         if(codecType === "audio")
         {
-            generateAudioInput(streams[1],i)
+            generateAudioInput(streams[i],i)
         }
         if(codecType === "subtitle")
         {
@@ -166,6 +165,7 @@ function generateVideoInput(videoStream, videoFileInfo,index)
      checkboxFPSLabel.append("Keep FPS the same",checkboxFPS);
 
      FPSSelect.type = "number";
+     FPSSelect.step = "0.01";
      FPSSelect.value = fpsScore;
      FPSDiv.classList.add("disabled")
      FPSSelectLabel.append("FPS: ", FPSSelect);
@@ -243,6 +243,9 @@ export function generateAudioInput(audioStream,index)
      const channels = document.createElement("p");
      const checkboxChannelsLabel = document.createElement("label");
      const checkboxChannels = document.createElement("input");
+     const divChannels = document.createElement("div");
+     const labelSelectChannels = document.createElement("label");
+     const selectChannels = document.createElement("select");
 
      channels.textContent = `Channels: ${audioStream.channel_layout}`
 
@@ -251,14 +254,47 @@ export function generateAudioInput(audioStream,index)
      checkboxChannels.id = 'checkboxChannels';
      checkboxChannelsLabel.append("Keep Channels the same",checkboxChannels);
 
+     selectChannels.innerHTML = 
+     `
+        <option value="mono" selected>Mono</option>
+        <option value="stereo">Stereo</option>
+        <option value="2.1">2.1</option>
+        <option value="5.1">5.1</option>
+        <option value="7.1">7.1</option>
+     `
+     selectChannels.disabled = true;
+     divChannels.classList.add("disabled");
+     labelSelectChannels.append("Channels: ",selectChannels);
+     divChannels.append(labelSelectChannels);
+
+     checkboxChannels.addEventListener("click", () => {
+        if(checkboxChannels.checked)
+        {
+            selectChannels.disabled = true
+            divChannels.classList.add("disabled")
+        }
+        else
+        {
+            selectChannels.disabled = false
+            divChannels.classList.remove("disabled")
+        }
+     })
+
+     const codecAudio = document.createElement("p");
+     const sampleRate = document.createElement("p");
+
+     codecAudio.textContent = `Codec: ${audioStream.codec_long_name}`;
+     sampleRate.textContent = `Sample Rate: ${audioStream.sample_rate}Hz`;
+
      const tags = document.createElement("h3");
      const tagsLang = document.createElement("p");
      tags.textContent = "Tags:"
      tagsLang.textContent = `Language: ${audioStream.tags.language}`
 
 
-     outerDiv.querySelector(".content-1").append(channels,checkboxChannelsLabel);
-     outerDiv.querySelector(".content-3").append(tags,tagsLang)
+     outerDiv.querySelector(".content-1").append(channels,checkboxChannelsLabel,divChannels);
+     outerDiv.querySelector(".content-2").append(codecAudio,sampleRate);
+     outerDiv.querySelector(".content-3").append(tags,tagsLang);
      formBlock.append(outerDiv);
 }
 
@@ -267,17 +303,15 @@ export function generateSubsInput(subtitleStream,index)
      const outerDiv = generateBlockForStream("Subtitle",index);
 
      const subtitleType = document.createElement("p");
-     const subtitleFullNameType = document.createElement("p");
-     subtitleType.textContent = `Codec name: ${subtitleStream.codec_name}`
-     subtitleFullNameType.textContent = `Codec fullname: ${subtitleStream.codec_long_name}`
+     subtitleType.textContent = `Codec: ${subtitleStream.codec_long_name}`
 
      const tags = document.createElement("h3");
      const tagsLang = document.createElement("p");
      tags.textContent = "Tags:"
      tagsLang.textContent = `Language: ${subtitleStream.tags.language}`
 
-     outerDiv.querySelector(".content-2").append(subtitleType,subtitleFullNameType)
-     outerDiv.querySelector(".content-3").append(tags,tagsLang)
+     outerDiv.querySelector(".content-1").append(subtitleType);
+     outerDiv.querySelector(".content-2").append(tags,tagsLang);
 
      formBlock.append(outerDiv);
 }
@@ -285,6 +319,15 @@ export function generateSubsInput(subtitleStream,index)
 export function generateExtraInput(attachmentStream,index)
 {
      const outerDiv = generateBlockForStream("Attachment",index);
+     
+     const tags = document.createElement("h3");
+     const tagsFileName = document.createElement("p");
+     const tagsMime = document.createElement("p");
+     tags.textContent = "Tags:"
+     tagsFileName.textContent = `File Name: ${attachmentStream.tags.filename}`;
+     tagsMime.textContent = `Mimetype: ${attachmentStream.tags.mimetype}`;
+
+      outerDiv.querySelector(".content-1").append(tags,tagsFileName,tagsMime);
      formBlock.append(outerDiv);
 }
 
