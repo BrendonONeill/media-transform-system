@@ -20,18 +20,15 @@ export async function receivingChunks(req, res)
 }
 
 export async function finishedUpload(req, res){
-  let fileInformation = req.body
-  console.log(fileInformation)
-  let id = uuidv4();
-  VideoMetaData.set(id,fileInformation.commandInfo);
+  let fileInformation = req.body;
+  let id = uuidv4().slice(0,7);
+  fileInformation.id = id;
+  VideoMetaData.set(id,fileInformation);
   if(await chunkCheck(fileInformation))
   {
-    // clean up how this works
-    await generationFile(fileInformation)
-    await main(`${fileInformation.name}.${fileInformation.ext}`,id);
-    await chunkFileAndSendChunks(`${fileInformation.name}.${fileInformation.ext}`)
-    removeVideo(`${fileInformation.name}.${fileInformation.ext}`)
-    res.json("thank you")
+    await generationFile(fileInformation);
+    main(`${fileInformation.oldFileName}.${fileInformation.ext}`,id);
+    res.json("thank you");
   }
   else
   {
@@ -44,15 +41,12 @@ export async function finishedUploadffprob(req, res){
   if(await chunkCheck(fileInformation))
   {
     await generationFile(fileInformation)
-    let videoJson = getVideoInformation(`${fileInformation.name}.${fileInformation.ext}`)
-    //console.log(typeof videoJson)
-    removeVideo(`${fileInformation.name}.${fileInformation.ext}`)
+    let videoJson = getVideoInformation(`${fileInformation.oldFileName}.${fileInformation.ext}`)
+    removeVideo(`${fileInformation.oldFileName}.${fileInformation.ext}`,"IN")
     res.json(videoJson)
   }
   else
   {
      res.json("error uploading file")
   }
- 
-  
 }

@@ -5,11 +5,13 @@ export let commandString = ""
 
 export let videoFormInformation = 
 {
+ id: "",
  location: "",
  streamArrayInformation: [],
  ext:"",
  oldFileName: "", 
  fileName: "",
+ chunks: 0,
 }
 
 

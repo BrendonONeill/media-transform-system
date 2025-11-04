@@ -1,16 +1,17 @@
 import fs from "node:fs"
 import { buffer } from 'stream/consumers';
 import { Blob } from 'buffer';
-import { VideoMetaData } from "../src/ffmpeg.js";
 
 export  async function generationFile(videoInformation)
 {
     try {
         console.log("Creating video from chunks")
-        const writeStream = fs.createWriteStream(`./temp/${videoInformation.name}.${videoInformation.ext}`);
+        console.log(videoInformation)
+        const writeStream = fs.createWriteStream(`./temp/IN/${videoInformation.oldFileName}.${videoInformation.ext}`);
         let i = 0;
          while (i <= videoInformation.chunks) {
-            const filename = `./bucket/${i}__${videoInformation.name}`;
+            console.log("count: ",i)
+            const filename = `./bucket/${i}__${videoInformation.oldFileName}`;
             // Check if file exists
             if (!fs.existsSync(filename)) {
                 
@@ -18,15 +19,14 @@ export  async function generationFile(videoInformation)
                 break;
             }
             const readStream = fs.createReadStream(filename);
-            
             await new Promise((resolve, reject) => {
                 readStream.on('data', chunk => {
                     let end = chunk.length
-                    writeStream.write(chunk.subarray(0, chunk.length));
+                    writeStream.write(chunk.subarray(0, end));
                 });
                 
                 readStream.on('end', () => {
-                    //console.log(`Streamed: ${filename}`);
+                    console.log(`Streamed: ${filename}`);
                     resolve();
                 });
                 
@@ -38,10 +38,7 @@ export  async function generationFile(videoInformation)
             
             i++;
         }
-        VideoMetaData.set(videoInformation.name,videoInformation.commandInfo);
-        removeChunks(videoInformation.chunks,videoInformation.name)
-        
-
+        removeChunks(videoInformation.chunks,videoInformation.oldFileName);
     } catch (error) {
         
     }
@@ -56,7 +53,6 @@ export async function chunkCheck(fileInfo)
     let i = 0
     while(i < fileAmount)
     {
-        //console.log("checking... ", i)
         if(delayCount > 0)
         {
             await wait(delayAmount[delayCount]);
@@ -65,7 +61,7 @@ export async function chunkCheck(fileInfo)
         {
             return false
         }
-        let check = fs.existsSync(`./bucket/${i}__${fileInfo.name}`)
+        let check = fs.existsSync(`./bucket/${i}__${fileInfo.oldFileName}`)
         if(check)
         {
             i++
@@ -76,7 +72,7 @@ export async function chunkCheck(fileInfo)
             delayCount++
         }
     }
-
+    console.log("All chunks have transferred over");
     return true
 }
 
@@ -85,12 +81,12 @@ function wait(ms) {
 }
 
 
-export function removeVideo(name)
+export function removeVideo(name,dir)
 {
-            const filename = `./temp/${name}`;
+            const filename = `./temp/${dir}/${name}`;
             if (!fs.existsSync(filename)) {
                 
-                console.log(`No more files found at ./temp/${name}`);
+                console.log(`No more files found at ./temp/${dir}/${name}`);
             }
             else
             {
@@ -116,13 +112,14 @@ function removeChunks(chunks,name)
 }
 
 
-export async function chunkFileAndSendChunks(fileName)
+export async function chunkFileAndSendChunks(fileName,dir)
 {
-    const readStream = fs.createReadStream(`temp/new${fileName}`);
+    const readStream = fs.createReadStream(`temp/${dir}/${fileName}`);
     const fileBuffer = await buffer(readStream);
     const blob = new Blob([fileBuffer],{type: "video/x-matroska"});
     let chunkObj = chunkVideo(blob, fileName)
-    sendBackPrep(chunkObj)
+    removeVideo(fileName,"OUT");
+    sendBackPrep(chunkObj);
 }
 
 
