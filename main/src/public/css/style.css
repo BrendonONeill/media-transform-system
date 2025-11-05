@@ -356,6 +356,30 @@ canvas
     justify-content: flex-start;
 }
 
+.all-selection
+{
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.all-selection:hover
+{
+    border: 2px solid white;
+    background-color: var(--main-bg-colour-lighter-dark);
+}
+
+#submit
+{
+    border: 2px solid var(--main-bg-colour);
+    font-weight: bold;
+}
+
+#submit:hover
+{
+    border: 2px solid white;
+    background-color: var(--main-bg-colour-lighter-dark);
+}
+
 .disabled
 {
     opacity: 0.6;

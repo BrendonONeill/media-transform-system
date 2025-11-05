@@ -1,16 +1,13 @@
 import fs from "node:fs"
-import { Location } from "../src/index.js";
-
 export  async function generationFile(videoInformation)
 {
     try {
-        console.log("testing i am called")
-        let value = locationCheck(`${videoInformation.name}.${videoInformation.ext}`)
+        let value = locationCheck(videoInformation.location);
         const writeStream = fs.createWriteStream(value +`${videoInformation.name}.${videoInformation.ext}`);
          console.log("testing i am called too")
         let i = 0;
          while (i <= videoInformation.chunks) {
-            const filename = `./bucket/${i}__${videoInformation.name}`;
+            const filename = `./bucket/${i}__${videoInformation.id}-${videoInformation.name}`;
             console.log("testing i am called 3")
             // Check if file exists
             if (!fs.existsSync(filename)) {
@@ -24,7 +21,7 @@ export  async function generationFile(videoInformation)
             await new Promise((resolve, reject) => {
                 readStream.on('data', chunk => {
                     let end = chunk.length
-                    writeStream.write(chunk.subarray(0, chunk.length));
+                    writeStream.write(chunk.subarray(0, end));
                 });
                 
                 readStream.on('end', () => {
@@ -37,21 +34,58 @@ export  async function generationFile(videoInformation)
             
             i++;
         }
-        removeChunks(videoInformation.chunks,videoInformation.name)
+        removeChunks(videoInformation.chunks,`${videoInformation.id}-${videoInformation.name}`)
     } catch (error) {
         
     }
 }
 
+export async function chunkCheck(fileInfo)
+{
+    console.log("checking chunks")
+    let delayAmount = [0,30000,60000]
+    let delayCount = 0
+    let fileAmount = fileInfo.chunks
+    let i = 0
+    while(i < fileAmount)
+    {
+        if(delayCount > 0)
+        {
+            console.log("waiting on chunk...")
+            await wait(delayAmount[delayCount]);
+        }
+        else if(delayCount > 2)
+        {
+            return false
+        }
+        let check = fs.existsSync(`./bucket/${i}__${fileInfo.id}-${fileInfo.name}`)
+        if(check)
+        {
+            i++
+            delayCount = 0
+        }
+        else
+        {
+            delayCount++
+        }
+    }
+    console.log("All chunks have transferred over");
+    return true
+}
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function locationCheck(name)
 {
-    if(!Location[name])
+    if(name === "")
     {
          return './videos/'
     }
     else
     {
-        return Location[name]
+        return name
     }
 }
 

@@ -1,6 +1,6 @@
 import {generationFile} from '../../../utils/createFile.js'
 import fs from "node:fs"
-import { Location } from '../../index.js';
+import { chunkCheck } from '../../../utils/createFile.js';
 
 export async function receivingChunks(req, res){
    console.log("Returned Chunk received from: ", req.headers['x-original-filename'] );
@@ -17,8 +17,15 @@ export async function receivingChunks(req, res){
 
 export async function finishedUpload(req, res){
   let fileInformation = req.body
-  generationFile(fileInformation)
-  res.json("thank you")
+  if(await chunkCheck(fileInformation))
+  {
+    await generationFile(fileInformation);
+    res.json("thank you")
+  }
+  else
+  {
+    res.json("error uploading file")
+  }
 }
 
 
@@ -27,7 +34,5 @@ export async function setLocation(req, res)
   console.log("setting location")
   let location = req.body.location
   let file = req.body.name
-  Location[file] = location
-  console.log(Location)
   res.json('success')
 }

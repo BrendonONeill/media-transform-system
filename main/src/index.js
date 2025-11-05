@@ -6,7 +6,6 @@ import { dirname} from 'path';
 import { fileURLToPath } from 'url';
 import videoReturnedRouter from './Routes/fileCreation/routes.js'
 
-export const Location = {}
 const app = Express()
 
 app.use(cors("*"));
