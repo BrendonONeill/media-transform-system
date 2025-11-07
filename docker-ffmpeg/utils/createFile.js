@@ -1,6 +1,7 @@
 import fs from "node:fs"
 import { buffer } from 'stream/consumers';
 import { Blob } from 'buffer';
+import { VideoMetaData } from "../src/ffmpeg.js";
 
 export  async function generationFile(videoInformation)
 {
@@ -112,14 +113,15 @@ function removeChunks(chunks,name)
 }
 
 
-export async function chunkFileAndSendChunks(fileName,dir)
+export async function chunkFileAndSendChunks(fileName,dir,id)
 {
     const readStream = fs.createReadStream(`temp/${dir}/${fileName}`);
     const fileBuffer = await buffer(readStream);
+    //Automate type
     const blob = new Blob([fileBuffer],{type: "video/x-matroska"});
     let chunkObj = chunkVideo(blob, fileName)
     removeVideo(fileName,"OUT");
-    sendBackPrep(chunkObj);
+    sendBackPrep(chunkObj,id);
 }
 
 
@@ -146,7 +148,7 @@ function chunkVideo(file,filename)
 }
 
 
-async function sendBackPrep(chunksObj)
+async function sendBackPrep(chunksObj,id)
 { 
     let chunks = chunksObj.numberOfChunks - 1
     let chunksObjArr = chunksObj.mediaChunks
@@ -170,10 +172,11 @@ async function sendBackPrep(chunksObj)
         arrChunks = uploadFetch(arrChunks)
     }
     try {
-        let res = await fetch("http://localhost:3000/return/finishedUpload", {method:"POST", body:JSON.stringify({name: chunksObj.name.split(".")[0], ext: chunksObj.name.split(".")[1],chunks:chunks}), headers: {'Content-Type': 'application/json'}})
+        const {fileName,ext, chunks, location } = VideoMetaData.get(id);
+        let res = await fetch("http://localhost:3000/return/finishedUpload", {method:"POST", body:JSON.stringify({name: fileName, ext,chunks,location,id}), headers: {'Content-Type': 'application/json'}})
         if(res.ok)
         {
-            console.log("Happy")
+            console.log("Sent back to main server");
             return
         }
         else

@@ -2,6 +2,6 @@ import { spawnSync } from 'child_process';
 
 export function getVideoInformation(file)
 {
-    const results = spawnSync('ffprobe',["-v", "quiet", "-print_format", "json", "-show_streams", "-i", `temp/IN/${file}`],{ encoding: "utf-8"})
+    const results = spawnSync('ffprobe',["-v", "quiet", "-print_format", "json", "-show_streams", "-i", `temp/IN/${file}`],{ encoding: "utf-8"});
     return JSON.parse(results.stdout)
 }

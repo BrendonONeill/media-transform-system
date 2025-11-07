@@ -1,7 +1,7 @@
 import { spawnSync } from 'child_process';
 import { EventEmitter } from 'node:events';
 import {chunkFileAndSendChunks, removeVideo} from '../utils/createFile.js';
-import { VideoMetaData } from '../src/ffmpeg.js';
+import { SystemLogger, VideoMetaData } from '../src/ffmpeg.js';
 import fs from 'fs';
 const videoEmitter = new EventEmitter();
 const videoList = []
@@ -12,18 +12,21 @@ videoEmitter.on('chunk', chunkFileAndSendChunks);
 
 export async  function main(fileName, id)
 {
- console.log("Starting ffmpeg process")
+ SystemLogger.write(`Starting ffmpeg process on ${fileName}.`);
  videoEmitter.emit('add', {fileName,id})
 }
 
 export function videoAddTask(fileObject)
 {
   videoList.push(fileObject)
+  SystemLogger.write(`${fileObject.fileName} added to queue.`);
   if(!active)
   {
+    SystemLogger.write("Queue system started.");
     active = true
     videoWork()
     active = false
+    SystemLogger.write("Queue system finished.");
   }
   return
 }
@@ -37,9 +40,10 @@ function videoWork()
     {
         let videoInfo = videoList.shift()
         const {commandArray: command, fileObject:videoInfoObj} = buildCommand(videoInfo.id,videoInfo.fileName)
+        console.log("COMMAND: ",command)
         ffmpegAction(videoInfo.fileName, command)
         fs.rmSync(`temp/IN/${videoInfoObj.oldFileName}.${videoInfoObj.ext}`)
-        videoEmitter.emit('chunk', `${videoInfoObj.id}-${videoInfoObj.fileName}.${videoInfoObj.ext}`,"OUT")
+        videoEmitter.emit('chunk', `${videoInfoObj.id}-${videoInfoObj.fileName}.${videoInfoObj.ext}`,"OUT",videoInfoObj.id)
     }
     return 
 }
@@ -66,7 +70,7 @@ function ffmpegAction(file, command)
 
 function buildCommand(id,file)
 {
-  let command = `-i temp/IN/${file} `; 
+  let command = `-i temp/IN/${file} -map 0 -map -0:t `; 
   console.log(id)
   let fileObject = VideoMetaData.get(id);
   let removedStreams = fileObject.streamArrayInformation.filter((stream) => (stream.selected === false))
@@ -80,4 +84,10 @@ function buildCommand(id,file)
   const commandArray = command.split(" ");
   fileObject.fileName = fileName;   
   return {commandArray,fileObject}
+}
+
+
+function customCommand()
+{
+  // plan out how to handle each video type
 }

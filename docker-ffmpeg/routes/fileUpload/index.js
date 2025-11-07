@@ -2,7 +2,7 @@ import {generationFile, chunkCheck, chunkFileAndSendChunks, removeVideo} from '.
 import fs from "node:fs"
 import { main } from '../../utils/ffmpeg.js';
 import { getVideoInformation } from '../../utils/ffprobe.js';
-import { VideoMetaData } from '../../src/ffmpeg.js';
+import { SystemLogger, VideoMetaData } from '../../src/ffmpeg.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function receivingChunks(req, res)
@@ -26,7 +26,9 @@ export async function finishedUpload(req, res){
   VideoMetaData.set(id,fileInformation);
   if(await chunkCheck(fileInformation))
   {
+    SystemLogger.write(`//////////////////////////////////////////////////////////////`);
     await generationFile(fileInformation);
+    SystemLogger.write(`File: ${fileInformation.oldFileName}.${fileInformation.ext} was uploaded successfully.`);
     main(`${fileInformation.oldFileName}.${fileInformation.ext}`,id);
     res.json("thank you");
   }
@@ -40,9 +42,15 @@ export async function finishedUploadffprob(req, res){
   let fileInformation = req.body
   if(await chunkCheck(fileInformation))
   {
+    SystemLogger.write(`//////////////////////////////////////////////////////////////`);
     await generationFile(fileInformation)
+    SystemLogger.write(`File: ${fileInformation.oldFileName}.${fileInformation.ext} was uploaded successfully.`);
     let videoJson = getVideoInformation(`${fileInformation.oldFileName}.${fileInformation.ext}`)
+    SystemLogger.write(`Information on ${fileInformation.oldFileName}.${fileInformation.ext} was collected.`);
     removeVideo(`${fileInformation.oldFileName}.${fileInformation.ext}`,"IN")
+    SystemLogger.write(`File: ${fileInformation.oldFileName}.${fileInformation.ext} was removed successfully.`);
+    SystemLogger.write(`File: ${fileInformation.oldFileName}.${fileInformation.ext} data returned to client.`);
+    SystemLogger.write(`//////////////////////////////////////////////////////////////`);
     res.json(videoJson)
   }
   else
