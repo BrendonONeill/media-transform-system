@@ -29,11 +29,26 @@ nameInput.addEventListener("change", (e) => {
 // Set up streamArrayInformation
 export function streamsArrayUpdate(streams)
 {
+    console.log("testing......")
+    console.log(streams)
     let streamsLen = streams.length;
     videoFormInformation.streamArrayInformation = new Array(streamsLen);
     for(let i = 0; i < streamsLen; i++)
     {
-        videoFormInformation.streamArrayInformation[i] = {selected: true, string:`-map 0:${i}`};
+        if(streams[i].codec_type === "video")
+        {
+            let fpsScore = (Number(streams[i].r_frame_rate.split("/")[0]) / Number(streams[i].r_frame_rate.split("/")[1])).toFixed(2)
+            videoFormInformation.streamArrayInformation[i] = {selected: true, string:`-map 0:${i}`, edited: false, ext: 'mp4', fps: fpsScore, height: streams[i].coded_height, width: streams[i].coded_width};
+        }
+        else if(streams[i].codec_type === "audio")
+        {
+            videoFormInformation.streamArrayInformation[i] = {selected: true, string:`-map 0:${i}`, edited: false, channel: streams[i].channel_layout};
+        }
+        else if(streams[i].codec_type === "subtitle" || streams[i].codec_type === "attachment")
+        {
+            videoFormInformation.streamArrayInformation[i] = {selected: true, string:`-map 0:${i}`};
+        }
+        
     }
     console.log(videoFormInformation.streamArrayInformation)
 }

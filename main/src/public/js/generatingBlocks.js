@@ -10,9 +10,10 @@ const videoStreamsBlockText = document.querySelector(".video-streams-p");
 const videoDurationBlockText = document.querySelector(".video-length-p");
 const videoSizeBlockText = document.querySelector(".video-size-p");
 const videoImageBlock = document.querySelector(".video-image");
-const allSelectionButton = document.querySelector(".all-selection")
+const allSelectionButton = document.querySelector(".all-selection");
 
-let selectedCheckBoxs = ""
+let allStreamsContainers = null;
+let selectedCheckBoxs = "";
 
 allSelectionButton.addEventListener("click", (e) => selectedCheckBoxsHandler(e))
 
@@ -72,14 +73,18 @@ export function generateFormParts(streams,file)
             generateExtraInput(streams[i],i)
         }
     }
-    selectedCheckBoxs = document.querySelectorAll(".selectedStream")
-    addActionOnCheckbox()    
+    allStreamsContainers = document.querySelectorAll(".generated-stream-block");
+    console.log(allStreamsContainers)
+    testingIdea()
+
+    //selectedCheckBoxs = document.querySelectorAll(".selectedStream")
+    //addActionOnCheckbox()    
 }
 
 function generateBlockForStream(type,index)
 {
      const outerDiv = document.createElement("div");
-     outerDiv.classList.add("outer-div")
+     outerDiv.classList.add("outer-div", "generated-stream-block")
      outerDiv.dataset.stream = index;
      const nameDiv = document.createElement("div");
      const nameDivName = document.createElement("h3");
@@ -120,9 +125,10 @@ function generateVideoInput(videoStream, videoFileInfo,index)
      
      checkboxExtension.type = 'checkbox';
      checkboxExtension.checked = true;
-     checkboxExtension.id = 'checkboxExtension';
+     checkboxExtension.classList.add('checkboxExtension');
      checkboxExtensionLabel.append("Keep Extension the same",checkboxExtension);
 
+     extensionSelect.classList.add("selectVideoExt");
       extensionSelect.innerHTML = 
      `
         <option value="mp4" selected>MP4</option>
@@ -161,12 +167,13 @@ function generateVideoInput(videoStream, videoFileInfo,index)
 
      checkboxFPS.type = 'checkbox';
      checkboxFPS.checked = true;
-     checkboxFPS.id = 'checkboxFPS';
+     checkboxFPS.classList.add('checkboxFPS');
      checkboxFPSLabel.append("Keep FPS the same",checkboxFPS);
 
      FPSSelect.type = "number";
      FPSSelect.step = "0.01";
      FPSSelect.value = fpsScore;
+     FPSSelect.classList.add("changeFPSValue");
      FPSDiv.classList.add("disabled")
      FPSSelectLabel.append("FPS: ", FPSSelect);
      FPSDiv.append(FPSSelectLabel);
@@ -198,11 +205,13 @@ function generateVideoInput(videoStream, videoFileInfo,index)
 
      checkboxHxW.type = 'checkbox';
      checkboxHxW.checked = true;
-     checkboxHxW.id = 'checkboxHxW';
+     checkboxHxW.classList.add('checkboxHxW');
      checkboxHxWLabel.append("Keep Height and Width the same ",checkboxHxW);
 
      HSelect.type = "number";
+     HSelect.classList.add("heightValue");
      WSelect.type = "number";
+     WSelect.classList.add("widthValue");
      HSelect.value = videoStream.coded_height;
      WSelect.value = videoStream.coded_width;
 
@@ -251,9 +260,10 @@ export function generateAudioInput(audioStream,index)
 
      checkboxChannels.type = 'checkbox';
      checkboxChannels.checked = true;
-     checkboxChannels.id = 'checkboxChannels';
+     checkboxChannels.classList.add('checkboxChannels');
      checkboxChannelsLabel.append("Keep Channels the same",checkboxChannels);
 
+     selectChannels.classList.add("selectChannel")
      selectChannels.innerHTML = 
      `
         <option value="mono" selected>Mono</option>
@@ -383,24 +393,117 @@ export function streamBlocksReset()
     formBlock.innerHTML = "";
 }
 
-function addActionOnCheckbox()
+
+function testingIdea()
 {
-    selectedCheckBoxs.forEach((checkbox) => {
-        checkbox.addEventListener("change", () => {
-            console.log(checkbox)
-            let index = checkbox.dataset.stream;
-            if(checkbox.checked)
+    allStreamsContainers.forEach((streamContainer) => {
+        streamContainer.addEventListener("change", (e) => {
+            if(e.target.classList.contains("selectedStream"))
             {
-                console.log(videoFormInformation.streamArrayInformation[index]);
-                videoFormInformation.streamArrayInformation[index].selected = true;
+                handleStreamSelectedCheckbox(e.target.dataset.stream,e.target.checked)
+                return
+            }
+            let streamType = streamContainer.querySelector("h3").textContent
+            let index = streamContainer.querySelector(".selectedStream").dataset.stream
+            if(streamType.endsWith("Video"))
+            {
+                // Run this function
+                handleVideoStreamUpdates(index, e.target, streamContainer)
+            }
+            else if(streamType.endsWith("Audio"))
+            {
+                // Run this function
+                handleAudioStreamUpdates(index, e.target)
+            }
+            else if(streamType.endsWith("Subtitle"))
+            {
+                // Run this function
             }
             else
             {
-                console.log(videoFormInformation.streamArrayInformation[index]);
-                videoFormInformation.streamArrayInformation[index].selected = false;
+                // Run this function
             }
-            console.log(videoFormInformation.streamArrayInformation)
         })
-
     })
+}
+
+// remove don't need anymore
+
+
+
+function handleStreamSelectedCheckbox(index,isChecked)
+{
+    if(isChecked)
+    {
+        videoFormInformation.streamArrayInformation[index].selected = true;
+    }
+    else
+    {
+        videoFormInformation.streamArrayInformation[index].selected = false;
+    }
+    console.log(videoFormInformation.streamArrayInformation[index]);
+}
+
+function handleVideoStreamUpdates(index, target,parent)
+{
+    console.log("Video target: ",target.classList)
+    if(target.classList.contains("checkboxExtension") || target.classList.contains("checkboxFPS") || target.classList.contains("checkboxHxW"))
+    {
+        const checkboxExtension = parent.querySelector(".checkboxExtension");
+        const checkboxFPS = parent.querySelector(".checkboxFPS");
+        const checkboxHxW = parent.querySelector(".checkboxHxW");
+        console.log(videoFormInformation.streamArrayInformation[index])
+        if(checkboxExtension.checked === true && checkboxFPS.checked == true && checkboxHxW.checked === true)
+        {
+            console.log("Video Stream is the same")
+            videoFormInformation.streamArrayInformation[index].edited = false
+        }
+        else
+        {
+            videoFormInformation.streamArrayInformation[index].edited = true
+            console.log("Video Stream edited")
+        }   
+    }
+    if(target.classList.contains("selectVideoExt"))
+    {
+        videoFormInformation.streamArrayInformation[index].ext = target.value;
+        console.log(videoFormInformation.streamArrayInformation[index])
+    }
+    if(target.classList.contains("changeFPSValue"))
+    {
+        videoFormInformation.streamArrayInformation[index].fps = target.value;
+        console.log(videoFormInformation.streamArrayInformation[index])
+    }
+    if(target.classList.contains("heightValue"))
+    {
+        videoFormInformation.streamArrayInformation[index].height = target.value;
+        console.log(videoFormInformation.streamArrayInformation[index])
+    }
+    if(target.classList.contains("widthValue"))
+    {
+        videoFormInformation.streamArrayInformation[index].width = target.value;
+        console.log(videoFormInformation.streamArrayInformation[index])
+    }
+}
+
+function handleAudioStreamUpdates(index, target)
+{
+    if(target.classList.contains("checkboxChannels"))
+    {
+        if(target.checked)
+        {
+            console.log("Video Stream is the same")
+            videoFormInformation.streamArrayInformation[index].edited = false
+        }
+        else
+        {
+            videoFormInformation.streamArrayInformation[index].edited = true
+            console.log("Video Stream edited")
+        } 
+    }
+    if(target.classList.contains("selectChannel"))
+    {
+        videoFormInformation.streamArrayInformation[index].channel = target.value;
+        console.log(videoFormInformation.streamArrayInformation[index])
+    }
 }
