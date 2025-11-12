@@ -1,5 +1,8 @@
+import { videoDetails } from "./main.js";
+
 let locationInput = document.getElementById("locationForm");
 let nameInput = document.getElementById("nameForm");
+
 
 export let commandString = ""
 
@@ -38,15 +41,28 @@ export function streamsArrayUpdate(streams)
         if(streams[i].codec_type === "video")
         {
             let fpsScore = (Number(streams[i].r_frame_rate.split("/")[0]) / Number(streams[i].r_frame_rate.split("/")[1])).toFixed(2)
-            videoFormInformation.streamArrayInformation[i] = {selected: true, string:`-map 0:${i}`, edited: false, ext: 'mp4', fps: fpsScore, height: streams[i].coded_height, width: streams[i].coded_width};
+            let extType;
+            if(videoDetails.ext !== '')
+            {
+                extType = videoDetails.ext
+            }
+            else
+            {
+                extType = 'mp4'
+            }
+            videoFormInformation.streamArrayInformation[i] = { type:'video', selected: true, string:`-map 0:${i}`, edited: false, ext: extType, fps: fpsScore, height: streams[i].coded_height, width: streams[i].coded_width};
         }
         else if(streams[i].codec_type === "audio")
         {
-            videoFormInformation.streamArrayInformation[i] = {selected: true, string:`-map 0:${i}`, edited: false, channel: streams[i].channel_layout};
+            videoFormInformation.streamArrayInformation[i] = {type: 'audio',selected: true, string:`-map 0:${i}`, edited: false, channel: streams[i].channel_layout};
         }
-        else if(streams[i].codec_type === "subtitle" || streams[i].codec_type === "attachment")
+        else if(streams[i].codec_type === "subtitle")
         {
-            videoFormInformation.streamArrayInformation[i] = {selected: true, string:`-map 0:${i}`};
+            videoFormInformation.streamArrayInformation[i] = {type: 'subtitle',selected: true, string:`-map 0:${i}`, edited: false};
+        }
+        else if(streams[i].codec_type === "attachment")
+        {
+            videoFormInformation.streamArrayInformation[i] = {type:'attachment',selected: true, string:`-map 0:${i}`, edited: false};
         }
         
     }

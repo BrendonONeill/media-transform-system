@@ -3,9 +3,11 @@ import { EventEmitter } from 'node:events';
 import {chunkFileAndSendChunks, removeVideo} from '../utils/createFile.js';
 import { SystemLogger, VideoMetaData } from '../src/ffmpeg.js';
 import fs from 'fs';
+import mediaFormats from './mediaFormats.js';
 const videoEmitter = new EventEmitter();
 const videoList = []
 let active = false
+
 
 videoEmitter.on('add', videoAddTask);
 videoEmitter.on('chunk', chunkFileAndSendChunks);
@@ -41,7 +43,7 @@ function videoWork()
         let videoInfo = videoList.shift()
         const {commandArray: command, fileObject:videoInfoObj} = buildCommand(videoInfo.id,videoInfo.fileName)
         console.log("COMMAND: ",command)
-        ffmpegAction(videoInfo.fileName, command)
+        ffmpegAction(videoInfo.fileName, command, videoInfoObj.ext)
         fs.rmSync(`temp/IN/${videoInfoObj.oldFileName}.${videoInfoObj.ext}`)
         videoEmitter.emit('chunk', `${videoInfoObj.id}-${videoInfoObj.fileName}.${videoInfoObj.ext}`,"OUT",videoInfoObj.id)
     }
@@ -49,9 +51,23 @@ function videoWork()
 }
 
 
-function ffmpegAction(file, command)
+function ffmpegAction(file, command, ext)
 {
     console.log(file, ' is getting converted')
+    if(ext === "mkv")
+    {
+      const results = spawnSync('ffmpeg',['-i', `temp/IN/${file}`, '-map', '0', '-map', '-0:t', '-c', 'copy', `temp/IN/${file}`],{})
+
+    if (results.error) {
+        throw new Error(`FFmpeg spawn error: ${results.error.message}`);
+    }
+
+    if (results.status !== 0) {
+    throw new Error(
+      `FFmpeg exited with code ${results.status}: ${results.stderr}`
+    );
+    }
+    }
     const results = spawnSync('ffmpeg',command,{})
 
     if (results.error) {
@@ -70,24 +86,60 @@ function ffmpegAction(file, command)
 
 function buildCommand(id,file)
 {
-  let command = `-i temp/IN/${file} -map 0 -map -0:t `; 
+  let command = `-i temp/IN/${file}`; 
   console.log(id)
   let fileObject = VideoMetaData.get(id);
-  let removedStreams = fileObject.streamArrayInformation.filter((stream) => (stream.selected === false))
-  if(removedStreams.length > 0)
-  {
-    console.log("Removed streams", removedStreams)
-  }
-  console.log("after removing streams")
+  let streamCommand = handledStreams(fileObject.streamArrayInformation)
+  command += streamCommand
   let fileName = fileObject.fileName !== "" ? fileObject.fileName : fileObject.oldFileName 
-  command += `-c copy temp/OUT/${fileObject.id}-${fileName}.${fileObject.ext}`
-  const commandArray = command.split(" ");
+  command += ` temp/OUT/${fileObject.id}-${fileName}.${fileObject.ext}`
+  let commandArray = command.split(" ");
+  commandArray = commandArray.filter(c => c != "")
   fileObject.fileName = fileName;   
   return {commandArray,fileObject}
 }
 
-
-function customCommand()
+function handledStreams(arrayOfCommands)
 {
-  // plan out how to handle each video type
+  let removedStreams = arrayOfCommands.some(obj => obj.type === 'attachment' || obj.selected === false);
+  let encodedStreams = arrayOfCommands.filter(obj => obj.edited === true);
+  let command = ""
+  for(let i = 0; i < arrayOfCommands.length; i++)
+  {
+    if(arrayOfCommands[i].selected === false || arrayOfCommands[i].type === 'attachment')
+    {
+      continue
+    }
+    else
+    {
+      if(arrayOfCommands[i].edited)
+      {
+        let customC = customCommand(arrayOfCommands[i], removedStreams)
+        command = command + " " + customC
+      }
+      else
+      {
+
+        let streamCommand = removedStreams === true ? arrayOfCommands[i].string : "";
+        command = command + " " + streamCommand
+      }
+    }
+    
+  }
+  console.log(command)
+  if(encodedStreams.length == 0)
+  {
+    command = command + " -c copy"
+  }
+  return command
+}
+
+function customCommand(commandObj, rmS)
+{
+  if(commandObj.type == "video")
+  {
+    let a = mediaFormats[commandObj.ext]
+    let s = rmS === true ? commandObj.string : "";
+    return ` ${s} -c:v ${a.video}`
+  }
 }

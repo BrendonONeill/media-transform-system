@@ -21,6 +21,7 @@ export async function receivingChunks(req, res)
 
 export async function finishedUpload(req, res){
   let fileInformation = req.body;
+  console.log(fileInformation);
   let id = uuidv4().slice(0,7);
   fileInformation.id = id;
   VideoMetaData.set(id,fileInformation);
