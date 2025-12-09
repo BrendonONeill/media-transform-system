@@ -5,6 +5,7 @@ import { VideoMetaData } from "../src/ffmpeg.js";
 
 export  async function generationFile(videoInformation,id=null)
 {
+    // Rewrite this function to make sure chunks go into file
     try {
         console.log("Creating video from chunks")
         console.log(videoInformation)
@@ -57,6 +58,7 @@ export  async function generationFile(videoInformation,id=null)
 
 export async function chunkCheck(fileInfo)
 {
+    // rewrite to make sure all chunks transferred
     console.log("checking chunks")
     let delayAmount = [0,30000,60000]
     let delayCount = 0
@@ -84,6 +86,36 @@ export async function chunkCheck(fileInfo)
         }
     }
     console.log("All chunks have transferred over");
+    return true
+}
+
+export async function fileCheck(filename)
+{
+    console.log("checking chunks")
+    let delayAmount = [0,30000,60000]
+    let delayCount = 0
+    let i = 0
+    while(i < 1)
+    {
+        if(delayCount > 0)
+        {
+            await wait(delayAmount[delayCount]);
+        }
+        else if(delayCount > 2)
+        {
+            return false
+        }
+        let check = fs.existsSync(`./temp/IN/${filename}`)
+        if(check)
+        {
+            i++
+        }
+        else
+        {
+            delayCount++
+        }
+    }
+    console.log("File Exists ./temp/IN/");
     return true
 }
 

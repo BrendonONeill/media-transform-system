@@ -1,4 +1,4 @@
-import {generationFile, chunkCheck, chunkFileAndSendChunks, removeVideo} from '../../utils/createFile.js'
+import {generationFile, chunkCheck, chunkFileAndSendChunks, removeVideo, fileCheck} from '../../utils/createFile.js'
 import fs from "node:fs"
 import { main } from '../../utils/ffmpeg.js';
 import { getVideoInformation } from '../../utils/ffprobe.js';
@@ -21,18 +21,26 @@ export async function receivingChunks(req, res)
 
 export async function finishedUpload(req, res){
   let fileInformation = req.body;
-  console.log(fileInformation);
   let id = uuidv4().slice(0,7);
   fileInformation.id = id;
   VideoMetaData.set(id,fileInformation);
-  console.log("testing part 1: ", fileInformation, id)
-  if(await chunkCheck(fileInformation))
+  let chunkCheckResults =await chunkCheck(fileInformation)
+  if(chunkCheckResults)
   {
     SystemLogger.write(`//////////////////////////////////////////////////////////////`);
     await generationFile(fileInformation, id);
-    SystemLogger.write(`File: ${fileInformation.oldFileName}.${fileInformation.ext} was uploaded successfully.`);
-    main(`${fileInformation.oldFileName}.${fileInformation.ext}`,id);
-    res.json("thank you");
+    let fileCheckResults = await fileCheck(`${id}-${fileInformation.oldFileName}.${fileInformation.ext}`)
+    if(fileCheckResults)
+    {
+      SystemLogger.write(`File: ${fileInformation.oldFileName}.${fileInformation.ext} was uploaded successfully.`);
+      main(`${fileInformation.oldFileName}.${fileInformation.ext}`,id);
+      res.json("thank you");
+    }
+    else
+    {
+      // set up clean up function
+      res.json("error uploading file")
+    }
   }
   else
   {

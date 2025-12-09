@@ -77,7 +77,6 @@ function ffmpegAction(file, command, ext, id=0)
 
     if (results.status !== 0) {
     throw new Error(
-      console.log(`${results.stderr}`)
       `FFmpeg exited with code ${results.status}: ${results.stderr} `
     );
     }
@@ -88,7 +87,7 @@ function ffmpegAction(file, command, ext, id=0)
 
 function buildCommand(id,file)
 {
-  debugger
+  // Look for space created in command
   let command = `-i placeholder`; 
   console.log(id)
   let fileObject = VideoMetaData.get(id);
