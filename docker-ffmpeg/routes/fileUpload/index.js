@@ -25,10 +25,11 @@ export async function finishedUpload(req, res){
   let id = uuidv4().slice(0,7);
   fileInformation.id = id;
   VideoMetaData.set(id,fileInformation);
+  console.log("testing part 1: ", fileInformation, id)
   if(await chunkCheck(fileInformation))
   {
     SystemLogger.write(`//////////////////////////////////////////////////////////////`);
-    await generationFile(fileInformation);
+    await generationFile(fileInformation, id);
     SystemLogger.write(`File: ${fileInformation.oldFileName}.${fileInformation.ext} was uploaded successfully.`);
     main(`${fileInformation.oldFileName}.${fileInformation.ext}`,id);
     res.json("thank you");

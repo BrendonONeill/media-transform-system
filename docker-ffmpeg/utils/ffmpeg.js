@@ -43,20 +43,20 @@ function videoWork()
         let videoInfo = videoList.shift()
         const {commandArray: command, fileObject:videoInfoObj} = buildCommand(videoInfo.id,videoInfo.fileName)
         console.log("COMMAND: ",command)
-        ffmpegAction(videoInfo.fileName, command, videoInfoObj.ext)
-        fs.rmSync(`temp/IN/${videoInfoObj.oldFileName}.${videoInfoObj.ext}`)
+        ffmpegAction(videoInfo.fileName, command, videoInfoObj.ext, videoInfo.id)
+        fs.rmSync(`temp/IN/${videoInfo.id}-${videoInfoObj.oldFileName}.${videoInfoObj.ext}`)
         videoEmitter.emit('chunk', `${videoInfoObj.id}-${videoInfoObj.fileName}.${videoInfoObj.ext}`,"OUT",videoInfoObj.id)
     }
     return 
 }
 
 
-function ffmpegAction(file, command, ext)
+function ffmpegAction(file, command, ext, id=0)
 {
     console.log(file, ' is getting converted')
     if(ext === "mkv")
     {
-      const results = spawnSync('ffmpeg',['-i', `temp/IN/${file}`, '-map', '0', '-map', '-0:t', '-c', 'copy', `temp/IN/${file}`],{})
+      const results = spawnSync('ffmpeg',['-i', `temp/IN/${id}-${file}`, '-map', '0', '-map', '-0:t', '-c', 'copy', `temp/IN/${id}-${file}`],{})
 
     if (results.error) {
         throw new Error(`FFmpeg spawn error: ${results.error.message}`);
@@ -68,6 +68,7 @@ function ffmpegAction(file, command, ext)
     );
     }
     }
+    
     const results = spawnSync('ffmpeg',command,{})
 
     if (results.error) {
@@ -76,7 +77,8 @@ function ffmpegAction(file, command, ext)
 
     if (results.status !== 0) {
     throw new Error(
-      `FFmpeg exited with code ${results.status}: ${results.stderr}`
+      console.log(`${results.stderr}`)
+      `FFmpeg exited with code ${results.status}: ${results.stderr} `
     );
     }
 
@@ -86,7 +88,8 @@ function ffmpegAction(file, command, ext)
 
 function buildCommand(id,file)
 {
-  let command = `-i temp/IN/${file}`; 
+  debugger
+  let command = `-i placeholder`; 
   console.log(id)
   let fileObject = VideoMetaData.get(id);
   let streamCommand = handledStreams(fileObject.streamArrayInformation)
@@ -94,6 +97,7 @@ function buildCommand(id,file)
   let fileName = fileObject.fileName !== "" ? fileObject.fileName : fileObject.oldFileName 
   command += ` temp/OUT/${fileObject.id}-${fileName}.${fileObject.ext}`
   let commandArray = command.split(" ");
+  commandArray[1] = `temp/IN/${id}-${file}`
   commandArray = commandArray.filter(c => c != "")
   fileObject.fileName = fileName;   
   return {commandArray,fileObject}
@@ -140,6 +144,7 @@ function customCommand(commandObj, rmS)
   {
     let a = mediaFormats[commandObj.ext]
     let s = rmS === true ? commandObj.string : "";
+    console.log("testing: ",a,s);
     return ` ${s} -c:v ${a.video}`
   }
 }

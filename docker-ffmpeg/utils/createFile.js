@@ -3,15 +3,23 @@ import { buffer } from 'stream/consumers';
 import { Blob } from 'buffer';
 import { VideoMetaData } from "../src/ffmpeg.js";
 
-export  async function generationFile(videoInformation)
+export  async function generationFile(videoInformation,id=null)
 {
     try {
         console.log("Creating video from chunks")
         console.log(videoInformation)
-        const writeStream = fs.createWriteStream(`./temp/IN/${videoInformation.oldFileName}.${videoInformation.ext}`);
+        let writeStream;
+        if(id === null)
+        {
+            writeStream = fs.createWriteStream(`./temp/IN/${videoInformation.oldFileName}.${videoInformation.ext}`)
+        }
+        else
+        {
+            writeStream = fs.createWriteStream(`./temp/IN/${id}-${videoInformation.oldFileName}.${videoInformation.ext}`)
+        }
+
         let i = 0;
          while (i <= videoInformation.chunks) {
-            console.log("count: ",i)
             const filename = `./bucket/${i}__${videoInformation.oldFileName}`;
             // Check if file exists
             if (!fs.existsSync(filename)) {
@@ -27,7 +35,9 @@ export  async function generationFile(videoInformation)
                 });
                 
                 readStream.on('end', () => {
+                    console.log(`---------------------`);
                     console.log(`Streamed: ${filename}`);
+                    console.log(`---------------------`);
                     resolve();
                 });
                 
