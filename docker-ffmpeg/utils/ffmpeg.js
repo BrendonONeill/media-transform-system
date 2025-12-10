@@ -8,7 +8,6 @@ const videoEmitter = new EventEmitter();
 const videoList = []
 let active = false
 
-
 videoEmitter.on('add', videoAddTask);
 videoEmitter.on('chunk', chunkFileAndSendChunks);
 
@@ -94,9 +93,10 @@ function buildCommand(id,file)
   let streamCommand = handledStreams(fileObject.streamArrayInformation)
   command += streamCommand
   let fileName = fileObject.fileName !== "" ? fileObject.fileName : fileObject.oldFileName 
-  command += ` temp/OUT/${fileObject.id}-${fileName}.${fileObject.ext}`
+  let commandEnd = `temp/OUT/${fileObject.id}-${fileName}.${fileObject.ext}`
   let commandArray = command.split(" ");
   commandArray[1] = `temp/IN/${id}-${file}`
+  commandArray.push(commandEnd);
   commandArray = commandArray.filter(c => c != "")
   fileObject.fileName = fileName;   
   return {commandArray,fileObject}

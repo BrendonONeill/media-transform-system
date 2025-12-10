@@ -15,6 +15,7 @@ export let videoFormInformation =
  oldFileName: "", 
  fileName: "",
  chunks: 0,
+ chunkSizes: []
 }
 
 

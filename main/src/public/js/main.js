@@ -2,6 +2,7 @@
 import { uploadFileForInfo} from "./sendToFFPROBE.js";
 import { generateVideoInformationCard, streamBlocksReset } from "./generatingBlocks.js";
 import { upload, uploadPrep } from "./sendToFFMPEG.js";
+import { videoFormInformation } from "./command.js";
 import "./command.js";
 
 export const videoDetails = { duration:"", size:"", name:"", ext:""}
@@ -27,7 +28,9 @@ async function handleUpload(e)
  filesCollection = []
  filesCollection.push(chunkVideo(e.target.files[0]))
  streamBlocksReset()
- await uploadFileForInfo(filesCollection[0])
+ let chunkSizes = storeChunkValues(filesCollection[0].mediaChunks)
+ videoFormInformation.chunkSizes = chunkSizes
+ await uploadFileForInfo(filesCollection[0], chunkSizes)
  url = URL.createObjectURL(e.target.files[0])
  createScreenShot()
  videoDetails.name = e.target.files[0].name.split(".")[0];
@@ -38,7 +41,6 @@ async function handleUpload(e)
 
 // Handles getting video Upload
 submit.addEventListener("click", (e) => {
-    console.log("clicked")
     e.preventDefault()
     upload(filesCollection,uploadPrep)
 })
@@ -65,6 +67,17 @@ function chunkVideo(file)
           start = start + chunkSize
      }
     return {mediaChunks: mediaChunks, type: file.type, name: file.name, numberOfChunks: id, size: file.size}
+}
+
+
+function storeChunkValues(chunks, videoFormInformation)
+{
+    let chunkSizes = []
+    for(let i = 0; i < chunks.length; i++)
+    {
+        chunkSizes.push(chunks[i].size)
+    }
+    return chunkSizes
 }
 
 // Create image from video uploaded
@@ -104,19 +117,19 @@ function formatTime(value)
     {
         if(time > 3600)
         {
-            console.log(time)
+           
             hours = Math.floor(time / 3600)
             time = time - (hours * 3600)
         }
         else if(time > 60)
         {
-            console.log(time)
+           
             mins = Math.floor(time / 60)
             time = time - (mins * 60)
         }
         else
         {
-            console.log(time)
+            
             seconds = Math.round(time)
             finished = true
         }

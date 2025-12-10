@@ -9,84 +9,96 @@ export  async function generationFile(videoInformation,id=null)
     try {
         console.log("Creating video from chunks")
         console.log(videoInformation)
-        let writeStream;
-        if(id === null)
-        {
-            writeStream = fs.createWriteStream(`./temp/IN/${videoInformation.oldFileName}.${videoInformation.ext}`)
-        }
-        else
-        {
-            writeStream = fs.createWriteStream(`./temp/IN/${id}-${videoInformation.oldFileName}.${videoInformation.ext}`)
-        }
+        
+        const fileName = id === null? `./temp/IN/${videoInformation.oldFileName}.${videoInformation.ext}` : `./temp/IN/${id}-${videoInformation.oldFileName}.${videoInformation.ext}`;
+        let writeStream = fs.createWriteStream(fileName);
 
-        let i = 0;
-         while (i <= videoInformation.chunks) {
-            const filename = `./bucket/${i}__${videoInformation.oldFileName}`;
-            // Check if file exists
-            if (!fs.existsSync(filename)) {
-                
-                console.log(`No more files found. Stopped at ${i}`);
+        for(let i = 0; i <= videoInformation.chunks; i++)
+        {
+            const chunkFile = `./bucket/${i}__${videoInformation.oldFileName}`;
+            if (!fs.existsSync(chunkFile)) {
+                console.log(`No more files found. Stopped at ${i}/${videoInformation.chunks}`);
                 break;
             }
-            const readStream = fs.createReadStream(filename);
+
             await new Promise((resolve, reject) => {
-                readStream.on('data', chunk => {
-                    let end = chunk.length
-                    writeStream.write(chunk.subarray(0, end));
+                const readStream = fs.createReadStream(chunkFile);
+
+                readStream.on("error", (err) => {
+                    console.log(err);
+                    reject();
+                })
+
+                readStream.on("data", (chunk) => {
+                // Handle backpressure
+                if (!writeStream.write(chunk)) {
+                readStream.pause();
+                writeStream.once("drain", () => readStream.resume());
+                }
                 });
-                
-                readStream.on('end', () => {
+
+                readStream.on("end", () => {
                     console.log(`---------------------`);
-                    console.log(`Streamed: ${filename}`);
+                    console.log(`Streamed: ${chunkFile}`);
                     console.log(`---------------------`);
                     resolve();
                 });
-                
-                readStream.on('error', (err) => {
-                    console.log(err)
-                    reject();
-                });
-            });
-            
-            i++;
+            })
         }
+
+        await new Promise((resolve, reject) => {
+                writeStream.end();
+                writeStream.on("finish", resolve);
+                writeStream.on("error", reject);
+        });
         removeChunks(videoInformation.chunks,videoInformation.oldFileName);
     } catch (error) {
         
     }
 }
 
+
 export async function chunkCheck(fileInfo)
 {
-    // rewrite to make sure all chunks transferred
-    console.log("checking chunks")
-    let delayAmount = [0,30000,60000]
-    let delayCount = 0
-    let fileAmount = fileInfo.chunks
-    let i = 0
-    while(i < fileAmount)
+    console.log("Checking chunks...");
+
+    const maxRetries = 3;
+    const delayAmounts = [0, 3000, 5000, 15000, 30000];
+    const totalChunks = fileInfo.chunks + 1;
+
+    for (let i = 0; i < totalChunks; i++)
     {
-        if(delayCount > 0)
+        const chunkPath = `./bucket/${i}__${fileInfo.oldFileName}`;
+        let retryCount = 0;
+
+        while (retryCount < maxRetries)
         {
-            await wait(delayAmount[delayCount]);
+            if(fs.existsSync(chunkPath))
+            {
+                const stats = fs.statSync(chunkPath);
+                if(stats.size == fileInfo.chunkSizes[i])
+                {
+                     console.log(`✓ Chunk ${i}/${fileInfo.chunks}: ${stats.size} bytes`);
+                     break;
+                }
+            }
+
+            retryCount++;
+
+            if (retryCount < maxRetries) {
+                const delay = delayAmounts[retryCount];
+            console.log( `✗ Chunk ${i} missing. Retry ${retryCount}/${maxRetries} ` + `in ${delay}ms...`);
+            await wait(delay);
+            } else {
+                console.error(`✗ Chunk ${i} failed after ${maxRetries} retries`);
+                return false;
+            }
         }
-        else if(delayCount > 2)
-        {
-            return false
-        }
-        let check = fs.existsSync(`./bucket/${i}__${fileInfo.oldFileName}`)
-        if(check)
-        {
-            i++
-            delayCount = 0
-        }
-        else
-        {
-            delayCount++
-        }
+
     }
-    console.log("All chunks have transferred over");
-    return true
+
+    console.log(`✓ All ${totalChunks} chunks verified`);
+    return true;
 }
 
 export async function fileCheck(filename)
@@ -101,7 +113,7 @@ export async function fileCheck(filename)
         {
             await wait(delayAmount[delayCount]);
         }
-        else if(delayCount > 2)
+        if(delayCount > 2)
         {
             return false
         }
@@ -214,8 +226,9 @@ async function sendBackPrep(chunksObj,id)
         arrChunks = uploadFetch(arrChunks)
     }
     try {
-        const {fileName,ext, chunks, location } = VideoMetaData.get(id);
-        let res = await fetch("http://localhost:3000/return/finishedUpload", {method:"POST", body:JSON.stringify({name: fileName, ext,chunks,location,id}), headers: {'Content-Type': 'application/json'}})
+        const {fileName,ext, location} = VideoMetaData.get(id);
+        let chunkSizes = storeChunkValues(chunksObj.mediaChunks) 
+        let res = await fetch("http://localhost:3000/return/finishedUpload", {method:"POST", body:JSON.stringify({name: fileName, ext,chunks,location,id, chunkSizes}), headers: {'Content-Type': 'application/json'}})
         if(res.ok)
         {
             console.log("Sent back to main server");
@@ -247,4 +260,15 @@ async function uploadFetch(arrChunks)
         console.log(error)
     }
     
+}
+
+
+function storeChunkValues(chunks)
+{
+    let chunkSizes = []
+    for(let i = 0; i < chunks.length; i++)
+    {
+        chunkSizes.push(chunks[i].size)
+    }
+    return chunkSizes
 }
