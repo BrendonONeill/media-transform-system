@@ -24,7 +24,7 @@ export async function finishedUpload(req, res){
   let id = uuidv4().slice(0,7);
   fileInformation.id = id;
   VideoMetaData.set(id,fileInformation);
-  let chunkCheckResults =await chunkCheck(fileInformation)
+  let chunkCheckResults = await chunkCheck(fileInformation)
   if(chunkCheckResults)
   {
     SystemLogger.write(`//////////////////////////////////////////////////////////////`);

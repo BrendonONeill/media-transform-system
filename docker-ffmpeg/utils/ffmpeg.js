@@ -40,8 +40,10 @@ function videoWork()
     while(videoList.length >= 1)
     {
         let videoInfo = videoList.shift()
+        
         const {commandArray: command, fileObject:videoInfoObj} = buildCommand(videoInfo.id,videoInfo.fileName)
         console.log("COMMAND: ",command)
+
         ffmpegAction(videoInfo.fileName, command, videoInfoObj.ext, videoInfo.id)
         fs.rmSync(`temp/IN/${videoInfo.id}-${videoInfoObj.oldFileName}.${videoInfoObj.ext}`)
         videoEmitter.emit('chunk', `${videoInfoObj.id}-${videoInfoObj.fileName}.${videoInfoObj.ext}`,"OUT",videoInfoObj.id)
@@ -90,6 +92,12 @@ function buildCommand(id,file)
   let command = `-i placeholder`; 
   console.log(id)
   let fileObject = VideoMetaData.get(id);
+
+  if(fileObject.ext == "mkv")
+  {
+    handleAttachments()
+  }
+  debugger
   let streamCommand = handledStreams(fileObject.streamArrayInformation)
   command += streamCommand
   let fileName = fileObject.fileName !== "" ? fileObject.fileName : fileObject.oldFileName 
@@ -102,7 +110,25 @@ function buildCommand(id,file)
   return {commandArray,fileObject}
 }
 
-function handledStreams(arrayOfCommands)
+function buildCommandOld(id,file)
+{
+  // Look for space created in command
+  let command = `-i placeholder`; 
+  console.log(id)
+  let fileObject = VideoMetaData.get(id);
+  let streamCommand = handledStreams(fileObject.streamArrayInformation)
+  command += streamCommand
+  let fileName = fileObject.fileName !== "" ? fileObject.fileName : fileObject.oldFileName 
+  let commandEnd = `temp/OUT/${fileObject.id}-${fileName}.${fileObject.ext}`
+  let commandArray = command.split(" ");
+  commandArray[1] = `temp/IN/${id}-${file}`
+  commandArray.push(commandEnd);
+  commandArray = commandArray.filter(c => c != "")
+  fileObject.fileName = fileName;   
+  return {commandArray,fileObject}
+}
+
+function handledStreamsOld(arrayOfCommands)
 {
   let removedStreams = arrayOfCommands.some(obj => obj.type === 'attachment' || obj.selected === false);
   let encodedStreams = arrayOfCommands.filter(obj => obj.edited === true);
@@ -146,4 +172,59 @@ function customCommand(commandObj, rmS)
     console.log("testing: ",a,s);
     return ` ${s} -c:v ${a.video}`
   }
+}
+
+
+function handleAttachments()
+{
+
+}
+
+
+function handleEncoded()
+{
+
+}
+
+
+function handleCopy()
+{
+
+}
+
+function handleCustomCommand(commandObj,removedStreams,editedStream)
+{
+  let commandArr = [];
+
+  if(removedStreams)
+  {
+      commandArr.push(commandObj.string)
+  }
+  if(commandObj.type == "video")
+  {
+    //if()
+  }
+}
+
+function handledStreams(arrayOfCommands)
+{
+  let command = ""
+  let removedStreams = arrayOfCommands.filter(obj => obj.selected === false);
+
+ 
+  for (let i = 0; i < arrayOfCommands.length; i++) {
+    
+    if(arrayOfCommands[i].selected === true)
+    {
+      if(removedStreams === true || arrayOfCommands[i].edited === true)
+      {
+
+      }
+    }
+    else
+    {
+      continue
+    }
+  }
+  
 }

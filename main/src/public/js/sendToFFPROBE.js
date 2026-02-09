@@ -1,3 +1,4 @@
+import { updateFFPROBE } from "./command.js";
 import { generateFormParts } from "./generatingBlocks.js";
 
 const loadingBG = document.getElementById("loading-bg");
@@ -18,10 +19,12 @@ export async function uploadFileForInfo(chunks,chunkSizes)
         if(res.ok)
         {
             let data = await res.json()
+            updateFFPROBE(chunks.mediaChunks[0])
             generateFormParts(data.streams, chunks)
-            console.log(data);
+            console.log("[data] ",data);
             videoInfo = data;
-            loading()
+            
+            loading();
         }
     } catch (error) {
         console.log(error)

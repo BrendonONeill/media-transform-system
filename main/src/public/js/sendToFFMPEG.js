@@ -37,10 +37,9 @@ export async function uploadPrep(chunksObj)
         arrChunks = uploadFetch(arrChunks)
     }
     try {
-        videoFormInformation.ext = chunksObj.name.split(".")[1];
-        videoFormInformation.oldFileName = chunksObj.name.split(".")[0];
         videoFormInformation.chunks = chunks;
         let finishedUploadObj = videoFormInformation;
+        console.log(finishedUploadObj)
         let res = await fetch("http://localhost:3003/upload/finishedupload", {method:"POST", body:JSON.stringify(finishedUploadObj), headers: {'Content-Type': 'application/json'}})
         if(res.ok)
         {

@@ -145,13 +145,21 @@ function generateVideoInput(videoStream, videoFileInfo,index)
         {
             extensionSelect.disabled = true
             extensionDiv.classList.add("disabled")
+            videoFormInformation.newExt = ""
+            videoFormInformation.encoded = false;
+            console.log(videoFormInformation)
         }
         else
         {
             extensionSelect.disabled = false
             extensionDiv.classList.remove("disabled")
+            videoFormInformation.newExt = extensionSelect.value
+            videoFormInformation.encoded = true;
+            console.log(videoFormInformation)
         }
      })
+
+     extensionSelect.addEventListener("change", (e) => testing(e.target.value))
 
      const FPSType = document.createElement("p");
      const checkboxFPSLabel = document.createElement("label")
@@ -452,7 +460,6 @@ function handleVideoStreamUpdates(index, target,parent)
         const checkboxExtension = parent.querySelector(".checkboxExtension");
         const checkboxFPS = parent.querySelector(".checkboxFPS");
         const checkboxHxW = parent.querySelector(".checkboxHxW");
-        console.log(videoFormInformation.streamArrayInformation[index])
         if(checkboxExtension.checked === true && checkboxFPS.checked == true && checkboxHxW.checked === true)
         {
             console.log("Video Stream is the same")
@@ -462,28 +469,66 @@ function handleVideoStreamUpdates(index, target,parent)
         {
             videoFormInformation.streamArrayInformation[index].edited = true
             console.log("Video Stream edited")
-        }   
+        }
+        
+        if(checkboxExtension.checked)
+        {
+           videoFormInformation.streamArrayInformation[index].ext = videoFormInformation.streamArrayInformation[index].defaultExt;
+           videoFormInformation.streamArrayInformation[index].editedValues = handleEditUpdates(videoFormInformation.streamArrayInformation[index].editedValues,"ext")
+        }
+
+        if(checkboxFPS.checked)
+        {
+            videoFormInformation.streamArrayInformation[index].fps = videoFormInformation.streamArrayInformation[index].defaultFPS;
+            videoFormInformation.streamArrayInformation[index].editedValues = handleEditUpdates(videoFormInformation.streamArrayInformation[index].editedValues,"fps")
+        }
+
+        if(checkboxHxW.checked)
+        {
+            videoFormInformation.streamArrayInformation[index].editedValues = handleEditUpdates(videoFormInformation.streamArrayInformation[index].editedValues,"scale")
+            videoFormInformation.streamArrayInformation[index].height = videoFormInformation.streamArrayInformation[index].defaultHeight;
+            videoFormInformation.streamArrayInformation[index].width = videoFormInformation.streamArrayInformation[index].defaultWidth;
+        }
     }
     if(target.classList.contains("selectVideoExt"))
     {
         videoFormInformation.streamArrayInformation[index].ext = target.value;
-        console.log(videoFormInformation.streamArrayInformation[index])
+        if(!videoFormInformation.streamArrayInformation[index].editedValues.includes("ext"))
+        {
+            videoFormInformation.streamArrayInformation[index].editedValues.push("ext");
+            console.log("ext added")
+        }
+        
     }
     if(target.classList.contains("changeFPSValue"))
     {
         videoFormInformation.streamArrayInformation[index].fps = target.value;
-        console.log(videoFormInformation.streamArrayInformation[index])
+        if(!videoFormInformation.streamArrayInformation[index].editedValues.includes("fps"))
+        {
+            videoFormInformation.streamArrayInformation[index].editedValues.push("fps");
+            console.log("fps added")
+        }
     }
     if(target.classList.contains("heightValue"))
     {
         videoFormInformation.streamArrayInformation[index].height = target.value;
-        console.log(videoFormInformation.streamArrayInformation[index])
+        if(!videoFormInformation.streamArrayInformation[index].editedValues.includes("scale"))
+        {
+            videoFormInformation.streamArrayInformation[index].editedValues.push("scale");
+            console.log("scale added")
+        }
+        
     }
     if(target.classList.contains("widthValue"))
     {
         videoFormInformation.streamArrayInformation[index].width = target.value;
-        console.log(videoFormInformation.streamArrayInformation[index])
+        if(!videoFormInformation.streamArrayInformation[index].editedValues.includes("scale"))
+        {
+            videoFormInformation.streamArrayInformation[index].editedValues.push("scale");
+            console.log("scale added")
+        }
     }
+    console.log(videoFormInformation.streamArrayInformation[index])
 }
 
 function handleAudioStreamUpdates(index, target)
@@ -506,4 +551,16 @@ function handleAudioStreamUpdates(index, target)
         videoFormInformation.streamArrayInformation[index].channel = target.value;
         console.log(videoFormInformation.streamArrayInformation[index])
     }
+}
+
+
+function testing(targetValue)
+{
+    videoFormInformation.newExt = targetValue;
+}
+
+
+function handleEditUpdates(arr,value)
+{
+    return arr.filter((a) => a !== value)
 }

@@ -226,9 +226,10 @@ async function sendBackPrep(chunksObj,id)
         arrChunks = uploadFetch(arrChunks)
     }
     try {
-        const {fileName,ext, location} = VideoMetaData.get(id);
+        const {fileName,ext,location,newExt,encoded} = VideoMetaData.get(id);
+        let returnedExt = encoded == true ? newExt : ext;
         let chunkSizes = storeChunkValues(chunksObj.mediaChunks) 
-        let res = await fetch("http://localhost:3000/return/finishedUpload", {method:"POST", body:JSON.stringify({name: fileName, ext,chunks,location,id, chunkSizes}), headers: {'Content-Type': 'application/json'}})
+        let res = await fetch("http://localhost:3000/return/finishedUpload", {method:"POST", body:JSON.stringify({name: fileName, ext: returnedExt, chunks,location,id, chunkSizes}), headers: {'Content-Type': 'application/json'}})
         if(res.ok)
         {
             console.log("Sent back to main server");
