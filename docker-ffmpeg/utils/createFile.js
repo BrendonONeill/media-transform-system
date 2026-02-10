@@ -15,7 +15,7 @@ export  async function generationFile(videoInformation,id=null)
 
         for(let i = 0; i <= videoInformation.chunks; i++)
         {
-            const chunkFile = `./bucket/${i}__${videoInformation.oldFileName}`;
+            const chunkFile = `./bucket/${i}__${videoInformation.oldFileName}__${videoInformation.id}`;
             if (!fs.existsSync(chunkFile)) {
                 //console.log(`No more files found. Stopped at ${i}/${videoInformation.chunks}`);
                 break;
@@ -51,7 +51,7 @@ export  async function generationFile(videoInformation,id=null)
                 writeStream.on("finish", resolve);
                 writeStream.on("error", reject);
         });
-        removeChunks(videoInformation.chunks,videoInformation.oldFileName);
+        removeChunks(videoInformation.chunks,videoInformation.oldFileName, videoInformation.id);
     } catch (error) {
         
     }
@@ -68,7 +68,7 @@ export async function chunkCheck(fileInfo)
 
     for (let i = 0; i < totalChunks; i++)
     {
-        const chunkPath = `./bucket/${i}__${fileInfo.oldFileName}`;
+        const chunkPath = `./bucket/${i}__${fileInfo.oldFileName}__${fileInfo.id}`;
         let retryCount = 0;
 
         while (retryCount < maxRetries)
@@ -153,11 +153,11 @@ export function removeVideo(name,dir)
             
 }
 
-function removeChunks(chunks,name)
+function removeChunks(chunks,name, id)
 {
     let i = 0
     while (i <= chunks) {
-            const filename = `./bucket/${i}__${name}`;
+            const filename = `./bucket/${i}__${name}__${id}`;
 
             if (!fs.existsSync(filename)) {
                 

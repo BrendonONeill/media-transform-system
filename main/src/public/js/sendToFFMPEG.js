@@ -6,14 +6,14 @@ export async function upload(filesCollection,cb)
     let count = 0 
     while(count <= filesCollection.length - 1)
     {
-        cb(filesCollection[count])
+        cb(filesCollection[count], videoFormInformation.id)
         count++
     }
 
 }
 
 //submit 2
-export async function uploadPrep(chunksObj)
+export async function uploadPrep(chunksObj,id)
 { 
     let chunks = chunksObj.numberOfChunks - 1
     let chunksObjArr = chunksObj.mediaChunks
@@ -28,13 +28,13 @@ export async function uploadPrep(chunksObj)
         }
         else
         {
-            arrChunks = await uploadFetch(arrChunks) 
+            arrChunks = await uploadFetch(arrChunks,id) 
         }
         
     }
     if(arrChunks.length > 0)
     {
-        arrChunks = uploadFetch(arrChunks)
+        arrChunks = uploadFetch(arrChunks,id)
     }
     try {
         videoFormInformation.chunks = chunks;
@@ -69,13 +69,13 @@ export async function uploadPrep(chunksObj)
 }
 
 //submit 3
-async function uploadFetch(arrChunks)
+async function uploadFetch(arrChunks,id)
 {
     try {
         let taskPromises = []
         
         for (const obj of arrChunks) {
-        const promise = fetch("http://localhost:3003/upload/videochunks", {method:"POST", body:obj.chunk, headers: {'Content-Type': obj.chunk.type, 'Content-Length': obj.chunk.size.toString(), 'X-Original-Filename': obj.chunk.name.split(".")[0], 'X-Chunk-Number': obj.id},duplex: 'half'})
+        const promise = fetch("http://localhost:3003/upload/videochunks", {method:"POST", body:obj.chunk, headers: {'Content-Type': obj.chunk.type, 'Content-Length': obj.chunk.size.toString(), 'x-original-filename': obj.chunk.name.split(".")[0], 'x-chunk-number': obj.id, 'x-id-number':id},duplex: 'half'})
         taskPromises.push(promise);
         }
 

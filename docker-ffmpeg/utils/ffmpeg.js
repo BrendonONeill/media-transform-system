@@ -72,7 +72,6 @@ function ffmpegAction(file, command, ext, id=0)
 
 function buildCommand(id,file)
 {
-  debugger
   let command = []; 
   let commandArr = [];
   let fileObject = VideoMetaData.get(id);
