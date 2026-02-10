@@ -18,7 +18,9 @@ export let videoFormInformation =
  fileName: "",
  encoded: "false",
  chunks: 0,
- chunkSizes: []
+ chunkSizes: [],
+ inputFile:"",
+ outputFile:"",
 }
 
 

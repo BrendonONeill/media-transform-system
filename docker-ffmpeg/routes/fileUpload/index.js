@@ -1,4 +1,4 @@
-import {generationFile, chunkCheck, chunkFileAndSendChunks, removeVideo, fileCheck} from '../../utils/createFile.js'
+import {generationFile, chunkCheck, chunkFileAndSendChunks, removeVideo, fileCheck, generationFileNames} from '../../utils/createFile.js'
 import fs from "node:fs"
 import { main } from '../../utils/ffmpeg.js';
 import { getVideoInformation } from '../../utils/ffprobe.js';
@@ -21,13 +21,14 @@ export async function receivingChunks(req, res)
 
 export async function finishedUpload(req, res){
   let fileInformation = req.body;
+  generationFileNames(fileInformation)
   VideoMetaData.set(fileInformation.id,fileInformation);
   let chunkCheckResults = await chunkCheck(fileInformation)
   if(chunkCheckResults)
   {
     SystemLogger.write(`//////////////////////////////////////////////////////////////`);
     await generationFile(fileInformation, fileInformation.id);
-    let fileCheckResults = await fileCheck(`${fileInformation.id}-${fileInformation.oldFileName}.${fileInformation.ext}`)
+    let fileCheckResults = await fileCheck(fileInformation.inputFile)
     if(fileCheckResults)
     {
       SystemLogger.write(`File: ${fileInformation.oldFileName}.${fileInformation.ext} was uploaded successfully.`);

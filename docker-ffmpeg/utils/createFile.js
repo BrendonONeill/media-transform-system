@@ -10,14 +10,14 @@ export  async function generationFile(videoInformation,id=null)
         //console.log("Creating video from chunks")
         //console.log(videoInformation)
         
-        const fileName = id === null? `./temp/IN/${videoInformation.oldFileName}.${videoInformation.ext}` : `./temp/IN/${id}-${videoInformation.oldFileName}.${videoInformation.ext}`;
+        const fileName = `./temp/IN/${id}-${videoInformation.oldFileName}.${videoInformation.ext}`;
         let writeStream = fs.createWriteStream(fileName);
 
         for(let i = 0; i <= videoInformation.chunks; i++)
         {
             const chunkFile = `./bucket/${i}__${videoInformation.oldFileName}__${videoInformation.id}`;
             if (!fs.existsSync(chunkFile)) {
-                //console.log(`No more files found. Stopped at ${i}/${videoInformation.chunks}`);
+                console.log(`No more files found. Stopped at ${i}/${videoInformation.chunks}`);
                 break;
             }
 
@@ -25,7 +25,7 @@ export  async function generationFile(videoInformation,id=null)
                 const readStream = fs.createReadStream(chunkFile);
 
                 readStream.on("error", (err) => {
-                    //console.log(err);
+                    console.log(err);
                     reject();
                 })
 
@@ -130,7 +130,6 @@ export async function fileCheck(filename)
             delayCount++
         }
     }
-    //console.log("File Exists ./temp/IN/");
     return true
 }
 
@@ -175,6 +174,7 @@ export async function chunkFileAndSendChunks(fileName,dir,id)
     const readStream = fs.createReadStream(`temp/${dir}/${fileName}`);
     const fileBuffer = await buffer(readStream);
     //Automate type
+    //
     const blob = new Blob([fileBuffer],{type: "video/x-matroska"});
     let chunkObj = chunkVideo(blob, fileName)
     removeVideo(fileName,"OUT");
@@ -275,4 +275,19 @@ function storeChunkValues(chunks)
         chunkSizes.push(chunks[i].size)
     }
     return chunkSizes
+}
+
+
+export function generationFileNames(obj)
+{
+    obj.inputFile = `${obj.id}-${obj.oldFileName}.${obj.ext}`
+    let fileName = obj.fileName !== "" ? obj.fileName : obj.oldFileName
+    if(obj.newExt)
+    {
+        obj.outputFile = `${obj.id}-${fileName}.${obj.newExt}`
+    }
+    else
+    {
+        obj.outputFile = `${obj.id}-${fileName}.${obj.ext}`
+    }
 }

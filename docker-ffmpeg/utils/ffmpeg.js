@@ -19,6 +19,7 @@ export async  function main(fileName, id)
 
 export function videoAddTask(fileObject)
 {
+  debugger
   videoList.push(fileObject)
   SystemLogger.write(`${fileObject.fileName} added to queue.`);
   if(!active)
@@ -45,8 +46,9 @@ function videoWork()
         console.log("COMMAND: ",command)
 
         ffmpegAction(videoInfo.fileName, command, videoInfoObj.ext, videoInfo.id)
-        fs.rmSync(`temp/IN/${videoInfo.id}-${videoInfoObj.oldFileName}.${videoInfoObj.ext}`)
-        videoEmitter.emit('chunk', `${videoInfoObj.id}-${videoInfoObj.fileName}.${videoInfoObj.newExt}`,"OUT",videoInfoObj.id)
+        console.log("[videoinfo]", videoInfo)
+        fs.rmSync(`temp/IN/${videoInfoObj.inputFile}`);
+        videoEmitter.emit('chunk', `${videoInfoObj.outputFile}`,"OUT",videoInfoObj.id)
     }
     return 
 }
@@ -66,7 +68,7 @@ function ffmpegAction(file, command, ext, id=0)
     );
     }
 
-    console.log(videoList[0], ' completed')
+    console.log(file, ' completed')
 }
 
 
@@ -86,9 +88,9 @@ function buildCommand(id,file)
   commandArr.push(...streamsStrings);
 
   let fileName = fileObject.fileName !== "" ? fileObject.fileName : fileObject.oldFileName ;
-  let fileInput = `temp/IN/${id}-${file}`
-  let commandEnd = `temp/OUT/${fileObject.id}-${fileName}.${fileObject.newExt}`;
-
+  let fileInput = `temp/IN/${fileObject.inputFile}`;
+  let commandEnd = `temp/OUT/${fileObject.outputFile}`;
+ 
   if(fileObject.encoded)
   {
     let encoder = mediaFormats[fileObject.ext]
@@ -106,73 +108,6 @@ function buildCommand(id,file)
   return {command,fileObject}
 }
 
-// Old function
-function buildCommandOld(id,file)
-{
-  // Look for space created in command
-  let command = `-i placeholder`; 
-  console.log(id)
-  let fileObject = VideoMetaData.get(id);
-  let streamCommand = handledStreams(fileObject.streamArrayInformation)
-  command += streamCommand
-  let fileName = fileObject.fileName !== "" ? fileObject.fileName : fileObject.oldFileName 
-  let commandEnd = `temp/OUT/${fileObject.id}-${fileName}.${fileObject.ext}`
-  let commandArray = command.split(" ");
-  commandArray[1] = `temp/IN/${id}-${file}`
-  commandArray.push(commandEnd);
-  commandArray = commandArray.filter(c => c != "")
-  fileObject.fileName = fileName;   
-  return {commandArray,fileObject}
-}
-
-// Old function
-function handledStreamsOld(arrayOfCommands)
-{
-  let removedStreams = arrayOfCommands.some(obj => obj.type === 'attachment' || obj.selected === false);
-  let encodedStreams = arrayOfCommands.filter(obj => obj.edited === true);
-  let command = ""
-  for(let i = 0; i < arrayOfCommands.length; i++)
-  {
-    if(arrayOfCommands[i].selected === false || arrayOfCommands[i].type === 'attachment')
-    {
-      continue
-    }
-    else
-    {
-      if(arrayOfCommands[i].edited)
-      {
-        let customC = customCommand(arrayOfCommands[i], removedStreams)
-        command = command + " " + customC
-      }
-      else
-      {
-
-        let streamCommand = removedStreams === true ? arrayOfCommands[i].string : "";
-        command = command + " " + streamCommand
-      }
-    }
-    
-  }
-  console.log(command)
-  if(encodedStreams.length == 0)
-  {
-    command = command + " -c copy"
-  }
-  return command
-}
-
-// Old function
-function customCommand(commandObj, rmS)
-{
-  if(commandObj.type == "video")
-  {
-    let a = mediaFormats[commandObj.ext]
-    let s = rmS === true ? commandObj.string : "";
-    console.log("testing: ",a,s);
-    return ` ${s} -c:v ${a.video}`
-  }
-}
-
 
 function handleAttachments()
 {
@@ -188,7 +123,7 @@ function handleEncoded(encoder)
 
 function handleCopy()
 {
-
+  return `-c copy`
 }
 
 function handleCustomCommand(commandObj,removedStreams,editedStream)
@@ -235,7 +170,6 @@ function handledStreams(arrayOfCommands)
   let removedStreams = arrayOfCommands.some(obj => obj.selected === false);
   console.log("[removed Streams]",removedStreams)
 
- 
   for (let i = 0; i < arrayOfCommands.length; i++) {
     
     if(arrayOfCommands[i].selected === true)
