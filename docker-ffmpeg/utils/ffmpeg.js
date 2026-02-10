@@ -41,12 +41,12 @@ function videoWork()
     {
         let videoInfo = videoList.shift()
         
-        const {commandArray: command, fileObject:videoInfoObj} = buildCommand(videoInfo.id,videoInfo.fileName)
+        const {command, fileObject:videoInfoObj} = buildCommand(videoInfo.id,videoInfo.fileName)
         console.log("COMMAND: ",command)
 
         ffmpegAction(videoInfo.fileName, command, videoInfoObj.ext, videoInfo.id)
         fs.rmSync(`temp/IN/${videoInfo.id}-${videoInfoObj.oldFileName}.${videoInfoObj.ext}`)
-        videoEmitter.emit('chunk', `${videoInfoObj.id}-${videoInfoObj.fileName}.${videoInfoObj.ext}`,"OUT",videoInfoObj.id)
+        videoEmitter.emit('chunk', `${videoInfoObj.id}-${videoInfoObj.fileName}.${videoInfoObj.newExt}`,"OUT",videoInfoObj.id)
     }
     return 
 }
@@ -54,22 +54,6 @@ function videoWork()
 
 function ffmpegAction(file, command, ext, id=0)
 {
-    console.log(file, ' is getting converted')
-    if(ext === "mkv")
-    {
-      const results = spawnSync('ffmpeg',['-i', `temp/IN/${id}-${file}`, '-map', '0', '-map', '-0:t', '-c', 'copy', `temp/IN/${id}-${file}`],{})
-
-    if (results.error) {
-        throw new Error(`FFmpeg spawn error: ${results.error.message}`);
-    }
-
-    if (results.status !== 0) {
-    throw new Error(
-      `FFmpeg exited with code ${results.status}: ${results.stderr}`
-    );
-    }
-    }
-    
     const results = spawnSync('ffmpeg',command,{})
 
     if (results.error) {
@@ -88,28 +72,42 @@ function ffmpegAction(file, command, ext, id=0)
 
 function buildCommand(id,file)
 {
-  // Look for space created in command
-  let command = `-i placeholder`; 
-  console.log(id)
+  debugger
+  let command = []; 
+  let commandArr = [];
   let fileObject = VideoMetaData.get(id);
-
+  commandArr.push(`-i`);
+  commandArr.push(`placeholder`);
   if(fileObject.ext == "mkv")
   {
-    handleAttachments()
+    handleAttachments();
   }
-  debugger
-  let streamCommand = handledStreams(fileObject.streamArrayInformation)
-  command += streamCommand
-  let fileName = fileObject.fileName !== "" ? fileObject.fileName : fileObject.oldFileName 
-  let commandEnd = `temp/OUT/${fileObject.id}-${fileName}.${fileObject.ext}`
-  let commandArray = command.split(" ");
-  commandArray[1] = `temp/IN/${id}-${file}`
-  commandArray.push(commandEnd);
-  commandArray = commandArray.filter(c => c != "")
+  
+  let streamsStrings = handledStreams(fileObject.streamArrayInformation);
+  commandArr.push(...streamsStrings);
+
+  let fileName = fileObject.fileName !== "" ? fileObject.fileName : fileObject.oldFileName ;
+  let fileInput = `temp/IN/${id}-${file}`
+  let commandEnd = `temp/OUT/${fileObject.id}-${fileName}.${fileObject.newExt}`;
+
+  if(fileObject.encoded)
+  {
+    let encoder = mediaFormats[fileObject.ext]
+    commandArr.push(handleEncoded(encoder))
+  }
+  else
+  {
+    handleCopy()
+  }
+
+  command = commandArr.join(" ").split(" ");
+  command[1] = fileInput;
+  command.push(commandEnd);
   fileObject.fileName = fileName;   
-  return {commandArray,fileObject}
+  return {command,fileObject}
 }
 
+// Old function
 function buildCommandOld(id,file)
 {
   // Look for space created in command
@@ -128,6 +126,7 @@ function buildCommandOld(id,file)
   return {commandArray,fileObject}
 }
 
+// Old function
 function handledStreamsOld(arrayOfCommands)
 {
   let removedStreams = arrayOfCommands.some(obj => obj.type === 'attachment' || obj.selected === false);
@@ -163,6 +162,7 @@ function handledStreamsOld(arrayOfCommands)
   return command
 }
 
+// Old function
 function customCommand(commandObj, rmS)
 {
   if(commandObj.type == "video")
@@ -181,9 +181,9 @@ function handleAttachments()
 }
 
 
-function handleEncoded()
+function handleEncoded(encoder)
 {
-
+  return `-c:v ${encoder.video} -c:a ${encoder.audio}`
 }
 
 
@@ -200,16 +200,41 @@ function handleCustomCommand(commandObj,removedStreams,editedStream)
   {
       commandArr.push(commandObj.string)
   }
-  if(commandObj.type == "video")
+  
+  if(editedStream)
   {
-    //if()
+    if(commandObj.type == "video")
+    {
+      if(commandObj.editedValues.includes("fps"))
+      {
+        commandArr.push(`-r ${commandObj.fps}`)
+      }
+
+      if(commandObj.editedValues.includes("scale"))
+      {
+        commandArr.push(`-vf "scale=${commandObj.width}:${commandObj.height}"`)
+      }
+    }
+  }
+  if(commandArr.length > 0)
+  {
+    let commandString = ""
+    for (let i = 0; i < commandArr.length; i++) {
+      commandString = commandString + " " + commandArr[i];
+    }
+    return commandString.trim()
+  }
+  else
+  {
+    return null
   }
 }
 
 function handledStreams(arrayOfCommands)
 {
-  let command = ""
-  let removedStreams = arrayOfCommands.filter(obj => obj.selected === false);
+  let commandArr = []
+  let removedStreams = arrayOfCommands.some(obj => obj.selected === false);
+  console.log("[removed Streams]",removedStreams)
 
  
   for (let i = 0; i < arrayOfCommands.length; i++) {
@@ -218,7 +243,13 @@ function handledStreams(arrayOfCommands)
     {
       if(removedStreams === true || arrayOfCommands[i].edited === true)
       {
-
+        let remove = removedStreams;
+        let edit = arrayOfCommands[i].edited;
+        let result = handleCustomCommand(arrayOfCommands[i],remove,edit)
+        if(result !== null)
+        {
+          commandArr.push(result)
+        }
       }
     }
     else
@@ -227,4 +258,5 @@ function handledStreams(arrayOfCommands)
     }
   }
   
+  return commandArr
 }

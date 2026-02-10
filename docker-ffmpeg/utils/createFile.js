@@ -7,8 +7,8 @@ export  async function generationFile(videoInformation,id=null)
 {
     // Rewrite this function to make sure chunks go into file
     try {
-        console.log("Creating video from chunks")
-        console.log(videoInformation)
+        //console.log("Creating video from chunks")
+        //console.log(videoInformation)
         
         const fileName = id === null? `./temp/IN/${videoInformation.oldFileName}.${videoInformation.ext}` : `./temp/IN/${id}-${videoInformation.oldFileName}.${videoInformation.ext}`;
         let writeStream = fs.createWriteStream(fileName);
@@ -17,7 +17,7 @@ export  async function generationFile(videoInformation,id=null)
         {
             const chunkFile = `./bucket/${i}__${videoInformation.oldFileName}`;
             if (!fs.existsSync(chunkFile)) {
-                console.log(`No more files found. Stopped at ${i}/${videoInformation.chunks}`);
+                //console.log(`No more files found. Stopped at ${i}/${videoInformation.chunks}`);
                 break;
             }
 
@@ -25,7 +25,7 @@ export  async function generationFile(videoInformation,id=null)
                 const readStream = fs.createReadStream(chunkFile);
 
                 readStream.on("error", (err) => {
-                    console.log(err);
+                    //console.log(err);
                     reject();
                 })
 
@@ -38,9 +38,9 @@ export  async function generationFile(videoInformation,id=null)
                 });
 
                 readStream.on("end", () => {
-                    console.log(`---------------------`);
-                    console.log(`Streamed: ${chunkFile}`);
-                    console.log(`---------------------`);
+                    // console.log(`---------------------`);
+                   // console.log(`Streamed: ${chunkFile}`);
+                   //console.log(`---------------------`);
                     resolve();
                 });
             })
@@ -60,7 +60,7 @@ export  async function generationFile(videoInformation,id=null)
 
 export async function chunkCheck(fileInfo)
 {
-    console.log("Checking chunks...");
+    //console.log("Checking chunks...");
 
     const maxRetries = 3;
     const delayAmounts = [0, 3000, 5000, 15000, 30000];
@@ -76,6 +76,9 @@ export async function chunkCheck(fileInfo)
             if(fs.existsSync(chunkPath))
             {
                 const stats = fs.statSync(chunkPath);
+                console.log("[Chunk name]", `${i}__${fileInfo.oldFileName}`)
+                console.log("[Chunk Size]", `${stats.size}`);
+                console.log("[test]", `${fileInfo.chunkSizes[i]}`);
                 if(stats.size == fileInfo.chunkSizes[i])
                 {
                      console.log(`✓ Chunk ${i}/${fileInfo.chunks}: ${stats.size} bytes`);
@@ -97,13 +100,13 @@ export async function chunkCheck(fileInfo)
 
     }
 
-    console.log(`✓ All ${totalChunks} chunks verified`);
+    //console.log(`✓ All ${totalChunks} chunks verified`);
     return true;
 }
 
 export async function fileCheck(filename)
 {
-    console.log("checking chunks")
+    //console.log("checking chunks")
     let delayAmount = [0,30000,60000]
     let delayCount = 0
     let i = 0
@@ -127,7 +130,7 @@ export async function fileCheck(filename)
             delayCount++
         }
     }
-    console.log("File Exists ./temp/IN/");
+    //console.log("File Exists ./temp/IN/");
     return true
 }
 
@@ -141,7 +144,7 @@ export function removeVideo(name,dir)
             const filename = `./temp/${dir}/${name}`;
             if (!fs.existsSync(filename)) {
                 
-                console.log(`No more files found at ./temp/${dir}/${name}`);
+                //console.log(`No more files found at ./temp/${dir}/${name}`);
             }
             else
             {
@@ -158,7 +161,7 @@ function removeChunks(chunks,name)
 
             if (!fs.existsSync(filename)) {
                 
-                console.log(`No more files found. Stopped at ${i}`);
+                //console.log(`No more files found. Stopped at ${i}`);
                 break;
             }
             fs.rmSync(filename)
