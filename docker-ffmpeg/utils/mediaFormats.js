@@ -4,42 +4,48 @@ const mediaFormats = {
     extension: ".mp4",
     video: "libx264",
     audio: "aac",
-    subtitles: "mov_text"
+    subtitles: "mov_text",
+    meta: "video/mp4"
   },
   mov: {
     type: "mov",
     extension: ".mov",
     video: "libx264",
     audio: "aac",
-    subtitles: "mov_text"
+    subtitles: "mov_text",
+    meta: "video/quicktime"
   },
   mkv: {
     type: "mkv",
     extension: ".mkv",
     video: "libx264",
     audio: "aac",
-    subtitles: "ass"
+    subtitles: "ass",
+    meta: "video/x-matroska"
   },
   avi: {
     type: "avi",
     extension: ".avi",
     video: "mpeg4",
     audio: "mp3",
-    subtitles: "vobsub"
+    subtitles: "vobsub",
+    meta: "x-msvideo"
   },
   webm: {
     type: "webm",
     extension: ".webm",
     video: "vp8",
     audio: "opus",
-    subtitles: "webvtt"
+    subtitles: "webvtt",
+    meta: "video/webm"
   },
   flv: {
     type: "flv",
     extension: ".flv",
     video: "libx264",
     audio: "aac",
-    subtitles: ""
+    subtitles: "",
+    meta: "video/x-flv"
   },
   ts: {
     type: "ts",
@@ -47,13 +53,7 @@ const mediaFormats = {
     video: "libx264",
     audio: "aac",
     subtitles: "dvb_subtitle",
-  },
-  ogv: {
-    type: "ogv",
-    extension: ".ogv",
-    video: "vp8",
-    audio: "vorbis",
-    subtitles: ""
+    meta: "video/mp2t",
   }
 };
 

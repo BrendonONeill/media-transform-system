@@ -77,8 +77,7 @@ export function generateFormParts(streams,file)
     console.log(allStreamsContainers)
     testingIdea()
 
-    //selectedCheckBoxs = document.querySelectorAll(".selectedStream")
-    //addActionOnCheckbox()    
+    selectedCheckBoxs = document.querySelectorAll(".selectedStream")    
 }
 
 function generateBlockForStream(type,index)
@@ -372,6 +371,7 @@ export function formatSize(bytes)
 
 function selectedCheckBoxsHandler(eve)
 {
+   debugger
    eve.preventDefault()
    if(selectedCheckBoxs !== "")
    {

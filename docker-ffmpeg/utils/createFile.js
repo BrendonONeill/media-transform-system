@@ -2,6 +2,7 @@ import fs from "node:fs"
 import { buffer } from 'stream/consumers';
 import { Blob } from 'buffer';
 import { VideoMetaData } from "../src/ffmpeg.js";
+import mediaFormats from "./mediaFormats.js";
 
 export  async function generationFile(videoInformation,id=null)
 {
@@ -169,16 +170,18 @@ function removeChunks(chunks,name, id)
 }
 
 
-export async function chunkFileAndSendChunks(fileName,dir,id)
+export async function chunkFileAndSendChunks(fileName,dir,vo)
 {
     const readStream = fs.createReadStream(`temp/${dir}/${fileName}`);
     const fileBuffer = await buffer(readStream);
     //Automate type
-    //
-    const blob = new Blob([fileBuffer],{type: "video/x-matroska"});
+    let ext = vo.newExt !== ""  ? vo.newExt : vo.ext;
+    let type = blobType(ext);
+    console.log(type)
+    const blob = new Blob([fileBuffer],{type});
     let chunkObj = chunkVideo(blob, fileName)
     removeVideo(fileName,"OUT");
-    sendBackPrep(chunkObj,id);
+    sendBackPrep(chunkObj,vo.id);
 }
 
 
@@ -290,4 +293,11 @@ export function generationFileNames(obj)
     {
         obj.outputFile = `${obj.id}-${fileName}.${obj.ext}`
     }
+}
+
+
+function blobType(ext)
+{
+    let value = mediaFormats[ext].meta;
+    return value;
 }

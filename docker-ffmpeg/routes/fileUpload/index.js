@@ -32,7 +32,7 @@ export async function finishedUpload(req, res){
     if(fileCheckResults)
     {
       SystemLogger.write(`File: ${fileInformation.oldFileName}.${fileInformation.ext} was uploaded successfully.`);
-      main(`${fileInformation.oldFileName}.${fileInformation.ext}`,fileInformation.id);
+      main(fileInformation);
       res.json("thank you");
     }
     else

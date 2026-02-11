@@ -11,22 +11,21 @@ let active = false
 videoEmitter.on('add', videoAddTask);
 videoEmitter.on('chunk', chunkFileAndSendChunks);
 
-export async  function main(fileName, id)
+export async  function main(fileObject)
 {
- SystemLogger.write(`Starting ffmpeg process on ${fileName}.`);
- videoEmitter.emit('add', {fileName,id})
+ SystemLogger.write(`Starting ffmpeg process on ${fileObject.oldFileName}.`);
+ videoEmitter.emit('add', fileObject)
 }
 
 export function videoAddTask(fileObject)
 {
-  debugger
-  videoList.push(fileObject)
+  videoList.push(`${fileObject.oldFileName}.${fileObject.ext}`)
   SystemLogger.write(`${fileObject.fileName} added to queue.`);
   if(!active)
   {
     SystemLogger.write("Queue system started.");
     active = true
-    videoWork()
+    videoWork(fileObject.id)
     active = false
     SystemLogger.write("Queue system finished.");
   }
@@ -36,27 +35,46 @@ export function videoAddTask(fileObject)
 
 
 
-function videoWork()
+function videoWork(id)
 {
     while(videoList.length >= 1)
     {
         let videoInfo = videoList.shift()
         
-        const {command, fileObject:videoInfoObj} = buildCommand(videoInfo.id,videoInfo.fileName)
+        const command = buildCommand(id)
         console.log("COMMAND: ",command)
-
-        ffmpegAction(videoInfo.fileName, command, videoInfoObj.ext, videoInfo.id)
+        let videoInfoObj = VideoMetaData.get(id)
+        ffmpegAction(command, id)
         console.log("[videoinfo]", videoInfo)
         fs.rmSync(`temp/IN/${videoInfoObj.inputFile}`);
-        videoEmitter.emit('chunk', `${videoInfoObj.outputFile}`,"OUT",videoInfoObj.id)
+        videoEmitter.emit('chunk', `${videoInfoObj.outputFile}`,"OUT",videoInfoObj)
     }
     return 
 }
 
 
-function ffmpegAction(file, command, ext, id=0)
+function ffmpegAction(command,id)
 {
-    const results = spawnSync('ffmpeg',command,{})
+    let videoInfoObj = VideoMetaData.get(id)
+    console.log(command)
+    if(videoInfoObj.attachments)
+    {
+      const copyResults = spawnSync('ffmpeg',['-i', `temp/IN/${videoInfoObj.inputFile}`,'-map','0:v?','-map','0:a?','-map','0:s?', '-c', 'copy', `temp/IN/${videoInfoObj.id}-att.mkv` ],{})
+      
+      if (copyResults.error) {
+        throw new Error(`FFmpeg spawn error: ${copyResults.error.message}`);
+      }
+
+      if (copyResults.status !== 0) {
+        throw new Error(`FFmpeg exited with code ${copyResults.status}: ${copyResults.stderr}`);
+      }
+
+      command[1] = `temp/IN/${videoInfoObj.id}-att.mkv`
+    }
+
+    const results = spawnSync('ffmpeg',command,{
+      maxBuffer: 1024 * 1024 * 10,
+    })
 
     if (results.error) {
         throw new Error(`FFmpeg spawn error: ${results.error.message}`);
@@ -68,23 +86,24 @@ function ffmpegAction(file, command, ext, id=0)
     );
     }
 
-    console.log(file, ' completed')
+    console.log(videoInfoObj.file, ' completed')
 }
 
 
-function buildCommand(id,file)
+function buildCommand(id)
 {
   let command = []; 
   let commandArr = [];
   let fileObject = VideoMetaData.get(id);
   commandArr.push(`-i`);
   commandArr.push(`placeholder`);
+  console.log(fileObject);
   if(fileObject.ext == "mkv")
   {
-    handleAttachments();
+    handleAttachments(fileObject);
   }
   
-  let streamsStrings = handledStreams(fileObject.streamArrayInformation);
+  let streamsStrings = handledStreams(fileObject.streamArrayInformation,fileObject.encoded);
   commandArr.push(...streamsStrings);
 
   let fileName = fileObject.fileName !== "" ? fileObject.fileName : fileObject.oldFileName ;
@@ -93,8 +112,9 @@ function buildCommand(id,file)
  
   if(fileObject.encoded)
   {
-    let encoder = mediaFormats[fileObject.ext]
-    commandArr.push(handleEncoded(encoder))
+    let ext = fileObject.newExt !== '' ? fileObject.newExt : fileObject.ext
+    let encoder = mediaFormats[ext]
+    commandArr.push(handleEncoded(encoder,fileObject))
   }
   else
   {
@@ -104,20 +124,42 @@ function buildCommand(id,file)
   command = commandArr.join(" ").split(" ");
   command[1] = fileInput;
   command.push(commandEnd);
-  fileObject.fileName = fileName;   
-  return {command,fileObject}
+  fileObject.fileName = fileName;
+  VideoMetaData.set(id,fileObject);
+  return command
 }
 
 
-function handleAttachments()
+function handleAttachments(fileObject)
 {
-
+  console.log(fileObject);
+  let attachmentStreams = fileObject.streamArrayInformation.some((obj) => obj.type === 'attachment');
+  if(!attachmentStreams)
+  {
+    return
+  }
+  fileObject.attachments = true;
 }
 
 
-function handleEncoded(encoder)
+function handleEncoded(encoder, videoObj)
 {
-  return `-c:v ${encoder.video} -c:a ${encoder.audio}`
+  let videoStream = videoObj.streamArrayInformation.some((obj) => obj.type === 'video');
+  let audioStream = videoObj.streamArrayInformation.some((obj) => obj.type === 'audio');
+  let subtitleStream = videoObj.streamArrayInformation.some((obj) => obj.type === 'subtitle');
+  let string = ''
+  if(videoStream)
+  {
+    string += `-c:v ${encoder.video} `
+  }
+  if(audioStream)
+  {
+    string += `-c:a ${encoder.audio} `
+  }if(subtitleStream)
+  {
+    string += `-c:s ${encoder.subtitles}`
+  }
+  return string;
 }
 
 
@@ -164,20 +206,23 @@ function handleCustomCommand(commandObj,removedStreams,editedStream)
   }
 }
 
-function handledStreams(arrayOfCommands)
+function handledStreams(arrayOfCommands,encoded)
 {
   let commandArr = []
+  let active = true;
   let removedStreams = arrayOfCommands.some(obj => obj.selected === false);
-  console.log("[removed Streams]",removedStreams)
-
   for (let i = 0; i < arrayOfCommands.length; i++) {
     
-    if(arrayOfCommands[i].selected === true)
+    if(arrayOfCommands[i].selected === true && arrayOfCommands[i].type !== 'attachment')
     {
-      if(removedStreams === true || arrayOfCommands[i].edited === true)
+      if(encoded)
       {
         let remove = removedStreams;
         let edit = arrayOfCommands[i].edited;
+        if(remove)
+        {
+          active = false;
+        }
         let result = handleCustomCommand(arrayOfCommands[i],remove,edit)
         if(result !== null)
         {
@@ -189,6 +234,11 @@ function handledStreams(arrayOfCommands)
     {
       continue
     }
+  }
+
+  if(active)
+  {
+    commandArr.push('-map 0:v? -map 0:a? -map 0:s?')
   }
   
   return commandArr

@@ -21,6 +21,7 @@ export let videoFormInformation =
  chunkSizes: [],
  inputFile:"",
  outputFile:"",
+ attachments:false
 }
 
 
