@@ -1,0 +1,103 @@
+[04-03-26] | 13:38:14 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 13:38:14 |  File: sample_960x400_ocean_with_audio.mp4 was uploaded successfully. 
+[04-03-26] | 13:38:14 |  Starting ffmpeg process on sample_960x400_ocean_with_audio. 
+[04-03-26] | 13:43:53 |  System running... 
+[04-03-26] | 13:44:03 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 13:44:03 |  File: sample_960x400_ocean_with_audio.mkv was uploaded successfully. 
+[04-03-26] | 13:44:03 |  Information on sample_960x400_ocean_with_audio.mkv was collected. 
+[04-03-26] | 13:44:03 |  File: sample_960x400_ocean_with_audio.mkv was removed successfully. 
+[04-03-26] | 13:44:03 |  File: sample_960x400_ocean_with_audio.mkv data returned to client. 
+[04-03-26] | 13:44:03 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 13:45:16 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 13:45:16 |  File: sample_960x400_ocean_with_audio.mp4 was uploaded successfully. 
+[04-03-26] | 13:45:16 |  Starting ffmpeg process on sample_960x400_ocean_with_audio. 
+[04-03-26] | 13:48:43 |  System running... 
+[04-03-26] | 13:48:50 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 13:48:50 |  File: sample_960x400_ocean_with_audio.mkv was uploaded successfully. 
+[04-03-26] | 13:48:50 |  Information on sample_960x400_ocean_with_audio.mkv was collected. 
+[04-03-26] | 13:48:50 |  File: sample_960x400_ocean_with_audio.mkv was removed successfully. 
+[04-03-26] | 13:48:50 |  File: sample_960x400_ocean_with_audio.mkv data returned to client. 
+[04-03-26] | 13:48:50 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 13:49:05 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 13:49:05 |  File: sample_960x400_ocean_with_audio.mp4 was uploaded successfully. 
+[04-03-26] | 13:49:05 |  Starting ffmpeg process on sample_960x400_ocean_with_audio. 
+[04-03-26] | 13:58:46 |  System running... 
+[04-03-26] | 13:58:56 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 13:58:56 |  File: sample_960x400_ocean_with_audio.mkv was uploaded successfully. 
+[04-03-26] | 13:58:56 |  Information on sample_960x400_ocean_with_audio.mkv was collected. 
+[04-03-26] | 13:58:56 |  File: sample_960x400_ocean_with_audio.mkv was removed successfully. 
+[04-03-26] | 13:58:56 |  File: sample_960x400_ocean_with_audio.mkv data returned to client. 
+[04-03-26] | 13:58:56 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:00:26 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:00:26 |  File: sample_960x400_ocean_with_audio.mkv was uploaded successfully. 
+[04-03-26] | 14:00:26 |  Information on sample_960x400_ocean_with_audio.mkv was collected. 
+[04-03-26] | 14:00:26 |  File: sample_960x400_ocean_with_audio.mkv was removed successfully. 
+[04-03-26] | 14:00:26 |  File: sample_960x400_ocean_with_audio.mkv data returned to client. 
+[04-03-26] | 14:00:26 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:01:38 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:01:38 |  File: sample_960x400_ocean_with_audio.mkv was uploaded successfully. 
+[04-03-26] | 14:01:39 |  Information on sample_960x400_ocean_with_audio.mkv was collected. 
+[04-03-26] | 14:01:39 |  File: sample_960x400_ocean_with_audio.mkv was removed successfully. 
+[04-03-26] | 14:01:39 |  File: sample_960x400_ocean_with_audio.mkv data returned to client. 
+[04-03-26] | 14:01:39 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:04:23 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:04:23 |  File: sample_960x400_ocean_with_audio.mkv was uploaded successfully. 
+[04-03-26] | 14:04:23 |  Information on sample_960x400_ocean_with_audio.mkv was collected. 
+[04-03-26] | 14:04:23 |  File: sample_960x400_ocean_with_audio.mkv was removed successfully. 
+[04-03-26] | 14:04:23 |  File: sample_960x400_ocean_with_audio.mkv data returned to client. 
+[04-03-26] | 14:04:23 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:04:33 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:04:33 |  File: sample_960x400_ocean_with_audio.mkv was uploaded successfully. 
+[04-03-26] | 14:04:33 |  Starting ffmpeg process on sample_960x400_ocean_with_audio. 
+[04-03-26] | 14:04:35 |  tttt added to queue. 
+[04-03-26] | 14:04:35 |  Queue system started. 
+[04-03-26] | 14:15:32 |  System running... 
+[04-03-26] | 14:15:43 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:15:43 |  File: sample_960x400_ocean_with_audio.mkv was uploaded successfully. 
+[04-03-26] | 14:15:43 |  Information on sample_960x400_ocean_with_audio.mkv was collected. 
+[04-03-26] | 14:15:43 |  File: sample_960x400_ocean_with_audio.mkv was removed successfully. 
+[04-03-26] | 14:15:43 |  File: sample_960x400_ocean_with_audio.mkv data returned to client. 
+[04-03-26] | 14:15:43 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:15:55 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:15:55 |  File: sample_960x400_ocean_with_audio.mkv was uploaded successfully. 
+[04-03-26] | 14:15:55 |  Starting ffmpeg process on sample_960x400_ocean_with_audio. 
+[04-03-26] | 14:15:58 |  test added to queue. 
+[04-03-26] | 14:15:58 |  Queue system started. 
+[04-03-26] | 14:16:02 |  Queue system finished. 
+[04-03-26] | 14:17:20 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:17:20 |  File: sample_960x400_ocean_with_audio.mkv was uploaded successfully. 
+[04-03-26] | 14:17:20 |  Information on sample_960x400_ocean_with_audio.mkv was collected. 
+[04-03-26] | 14:17:20 |  File: sample_960x400_ocean_with_audio.mkv was removed successfully. 
+[04-03-26] | 14:17:20 |  File: sample_960x400_ocean_with_audio.mkv data returned to client. 
+[04-03-26] | 14:17:20 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:17:32 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:17:32 |  File: sample_960x400_ocean_with_audio.mkv was uploaded successfully. 
+[04-03-26] | 14:17:32 |  Starting ffmpeg process on sample_960x400_ocean_with_audio. 
+[04-03-26] | 14:17:36 |  full flow added to queue. 
+[04-03-26] | 14:17:36 |  Queue system started. 
+[04-03-26] | 14:17:40 |  Queue system finished. 
+[04-03-26] | 14:20:43 |  System running... 
+[04-03-26] | 14:20:56 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:20:56 |  File: sample_960x400_ocean_with_audio.mkv was uploaded successfully. 
+[04-03-26] | 14:20:56 |  Information on sample_960x400_ocean_with_audio.mkv was collected. 
+[04-03-26] | 14:20:56 |  File: sample_960x400_ocean_with_audio.mkv was removed successfully. 
+[04-03-26] | 14:20:56 |  File: sample_960x400_ocean_with_audio.mkv data returned to client. 
+[04-03-26] | 14:20:56 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:21:05 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:21:05 |  File: sample_960x400_ocean_with_audio.mkv was uploaded successfully. 
+[04-03-26] | 14:21:05 |  Starting ffmpeg process on sample_960x400_ocean_with_audio. 
+[04-03-26] | 14:21:06 |  testing added to queue. 
+[04-03-26] | 14:21:06 |  Queue system started. 
+[04-03-26] | 14:21:10 |  Queue system finished. 
+[04-03-26] | 14:23:16 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:23:16 |  File: file_example_MP4_1280_10MG.mp4 was uploaded successfully. 
+[04-03-26] | 14:23:16 |  Information on file_example_MP4_1280_10MG.mp4 was collected. 
+[04-03-26] | 14:23:16 |  File: file_example_MP4_1280_10MG.mp4 was removed successfully. 
+[04-03-26] | 14:23:16 |  File: file_example_MP4_1280_10MG.mp4 data returned to client. 
+[04-03-26] | 14:23:16 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:23:43 |  ////////////////////////////////////////////////////////////// 
+[04-03-26] | 14:23:43 |  File: file_example_MP4_1280_10MG.mp4 was uploaded successfully. 
+[04-03-26] | 14:23:43 |  Starting ffmpeg process on file_example_MP4_1280_10MG. 
+[04-03-26] | 14:23:44 |  convert added to queue. 
+[04-03-26] | 14:23:44 |  Queue system started. 
+[04-03-26] | 14:23:46 |  Queue system finished. 

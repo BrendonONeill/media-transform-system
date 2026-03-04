@@ -29,6 +29,7 @@ export async function uploadFileForInfo(chunks,chunkSizes)
         if(res.ok)
         {
             let data = await res.json()
+            console.log("LOOK AT ME: ",chunks.mediaChunks[0])
             updateFFPROBE(chunks.mediaChunks[0])
             generateFormParts(data.streams, chunks)
             videoInfo = data;

@@ -79,9 +79,10 @@ export function streamsArrayUpdateAll(value)
 
 export function updateFFPROBE(data)
 {
-    extType = data.type  === "video/x-matroska" ? "mkv" : data.type === "video/mp4" ? "mp4" : data.type === "video/quicktime" ? "mov" : "mp4";
-    console.log("[ Should be first ]")
+    console.log(data.type)
+    extType = data.type  === "video/matroska" ? "mkv": data.type  === "video/x-matroska" ? "mkv"  : data.type === "video/mp4" ? "mp4" : data.type === "video/quicktime" ? "mov" : "mp4";
     videoFormInformation.newExt = "";
     videoFormInformation.ext = extType
     videoFormInformation.oldFileName = data.name.split(".")[0];
+    console.log("NOW LOOK AT ME ::",videoFormInformation)
 }

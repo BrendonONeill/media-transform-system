@@ -19,6 +19,7 @@ export async  function main(fileObject)
 
 export function videoAddTask(fileObject)
 {
+  debugger
   videoList.push(`${fileObject.oldFileName}.${fileObject.ext}`)
   SystemLogger.write(`${fileObject.fileName} added to queue.`);
   if(!active)
@@ -41,8 +42,9 @@ function videoWork(id)
     {
         let videoInfo = videoList.shift()
         
-        const command = buildCommand(id)
-        console.log("COMMAND: ",command)
+        let command = buildCommand(id)
+        command = command.filter((cmd) => cmd !== '');
+        console.log('[command]: ', command)
         let videoInfoObj = VideoMetaData.get(id)
         ffmpegAction(command, id)
         console.log("[videoinfo]", videoInfo)

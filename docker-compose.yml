@@ -5,9 +5,7 @@ services:
       dockerfile: Dockerfile
     image: node-ffmpeg:latest
     ports:
-     - "3006:3000"
-    env_file:
-     - .env
+     - "3003:3000"
     deploy:
       resources:
         limits:

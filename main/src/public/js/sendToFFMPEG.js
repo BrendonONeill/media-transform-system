@@ -15,6 +15,7 @@ export async function upload(filesCollection,cb)
 //submit 2
 export async function uploadPrep(chunksObj,id)
 { 
+    debugger
     let chunks = chunksObj.numberOfChunks - 1
     let chunksObjArr = chunksObj.mediaChunks
     let count = 0
