@@ -1,9 +1,6 @@
-import { videoDetails } from "./main.js";
-
 let extType;
 let locationInput = document.getElementById("locationForm");
 let nameInput = document.getElementById("nameForm");
-
 
 export let commandString = ""
 
@@ -27,20 +24,16 @@ export let videoFormInformation =
 
 locationInput.addEventListener("change", (e) => {
     videoFormInformation.location = e.target.value.trim();
-    console.log("Updated: " +videoFormInformation.location)
 })
 
 nameInput.addEventListener("change", (e) => {
     videoFormInformation.fileName = e.target.value.trim();
-    console.log("Updated: " +videoFormInformation.fileName)
 })
 
 
 // Set up streamArrayInformation
 export function streamsArrayUpdate(streams)
 {
-    console.log("testing......")
-    console.log(streams)
     let streamsLen = streams.length;
     videoFormInformation.streamArrayInformation = new Array(streamsLen);
     for(let i = 0; i < streamsLen; i++)
@@ -64,7 +57,6 @@ export function streamsArrayUpdate(streams)
         }
         
     }
-    console.log(videoFormInformation.streamArrayInformation)
 }
 
 // Change all values within streamArrayInformation
@@ -79,10 +71,8 @@ export function streamsArrayUpdateAll(value)
 
 export function updateFFPROBE(data)
 {
-    console.log(data.type)
     extType = data.type  === "video/matroska" ? "mkv": data.type  === "video/x-matroska" ? "mkv"  : data.type === "video/mp4" ? "mp4" : data.type === "video/quicktime" ? "mov" : "mp4";
     videoFormInformation.newExt = "";
     videoFormInformation.ext = extType
     videoFormInformation.oldFileName = data.name.split(".")[0];
-    console.log("NOW LOOK AT ME ::",videoFormInformation)
 }

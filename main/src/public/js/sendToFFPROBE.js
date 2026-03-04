@@ -9,7 +9,6 @@ export let videoInfo = ""
 export async function uploadFileForInfo(chunks,chunkSizes)
 {
     let id;
-    console.log("start")
     try {
         let resID = await fetch("http://localhost:3003/upload/genid");
         if(resID.ok)
@@ -18,9 +17,7 @@ export async function uploadFileForInfo(chunks,chunkSizes)
             id = data.id
             console.log(id)
         }
-        console.log("[ID ABOVE]")
         loading("Getting video information...")
-        console.log(chunks.mediaChunks)
         for(const [index, obj] of chunks.mediaChunks.entries())
         {
             let res =  await fetch("http://localhost:3003/upload/videochunks", {method:"POST", body:obj, headers: {'Content-Type': obj.type, 'Content-Length': obj.size.toString(), 'x-original-filename': obj.name.split(".")[0], 'x-chunk-number': index, 'x-id-number':id},duplex: 'half'})
@@ -29,7 +26,6 @@ export async function uploadFileForInfo(chunks,chunkSizes)
         if(res.ok)
         {
             let data = await res.json()
-            console.log("LOOK AT ME: ",chunks.mediaChunks[0])
             updateFFPROBE(chunks.mediaChunks[0])
             generateFormParts(data.streams, chunks)
             videoInfo = data;

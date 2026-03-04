@@ -1,4 +1,6 @@
 import { spawnSync } from 'child_process';
+import { spawn } from 'node:child_process';
+
 import { EventEmitter } from 'node:events';
 import {chunkFileAndSendChunks, removeVideo} from '../utils/createFile.js';
 import { SystemLogger, VideoMetaData } from '../src/ffmpeg.js';
@@ -11,22 +13,21 @@ let active = false
 videoEmitter.on('add', videoAddTask);
 videoEmitter.on('chunk', chunkFileAndSendChunks);
 
-export async  function main(fileObject)
+export async function main(fileObject)
 {
  SystemLogger.write(`Starting ffmpeg process on ${fileObject.oldFileName}.`);
  videoEmitter.emit('add', fileObject)
 }
 
-export function videoAddTask(fileObject)
+export async function videoAddTask(fileObject)
 {
-  debugger
   videoList.push(`${fileObject.oldFileName}.${fileObject.ext}`)
   SystemLogger.write(`${fileObject.fileName} added to queue.`);
   if(!active)
   {
     SystemLogger.write("Queue system started.");
     active = true
-    videoWork(fileObject.id)
+    await videoWork(fileObject.id)
     active = false
     SystemLogger.write("Queue system finished.");
   }
@@ -36,7 +37,7 @@ export function videoAddTask(fileObject)
 
 
 
-function videoWork(id)
+async function videoWork(id)
 {
     while(videoList.length >= 1)
     {
@@ -46,7 +47,7 @@ function videoWork(id)
         command = command.filter((cmd) => cmd !== '');
         console.log('[command]: ', command)
         let videoInfoObj = VideoMetaData.get(id)
-        ffmpegAction(command, id)
+        await ffmpegAction(command, id)
         console.log("[videoinfo]", videoInfo)
         fs.rmSync(`temp/IN/${videoInfoObj.inputFile}`);
         videoEmitter.emit('chunk', `${videoInfoObj.outputFile}`,"OUT",videoInfoObj)
@@ -55,40 +56,41 @@ function videoWork(id)
 }
 
 
-function ffmpegAction(command,id)
+async function ffmpegAction(command,id)
 {
     let videoInfoObj = VideoMetaData.get(id)
     console.log(command)
     if(videoInfoObj.attachments)
     {
-      const copyResults = spawnSync('ffmpeg',['-i', `temp/IN/${videoInfoObj.inputFile}`,'-map','0:v?','-map','0:a?','-map','0:s?', '-c', 'copy', `temp/IN/${videoInfoObj.id}-att.mkv` ],{})
-      
-      if (copyResults.error) {
-        throw new Error(`FFmpeg spawn error: ${copyResults.error.message}`);
-      }
-
-      if (copyResults.status !== 0) {
-        throw new Error(`FFmpeg exited with code ${copyResults.status}: ${copyResults.stderr}`);
-      }
-
+      const copyResults = await handleFfmpeg('ffmpeg',['-i', `temp/IN/${videoInfoObj.inputFile}`,'-map','0:v?','-map','0:a?','-map','0:s?', '-c', 'copy', `temp/IN/${videoInfoObj.id}-att.mkv` ],{})
       command[1] = `temp/IN/${videoInfoObj.id}-att.mkv`
     }
 
-    const results = spawnSync('ffmpeg',command,{
+    const results = await handleFfmpeg('ffmpeg',command,{
       maxBuffer: 1024 * 1024 * 10,
     })
-
-    if (results.error) {
-        throw new Error(`FFmpeg spawn error: ${results.error.message}`);
-    }
-
-    if (results.status !== 0) {
-    throw new Error(
-      `FFmpeg exited with code ${results.status}: ${results.stderr} `
-    );
-    }
-
     console.log(videoInfoObj.file, ' completed')
+}
+
+function handleFfmpeg(cmd,args = [], options= {})
+{
+  return new Promise((resolve, reject) => {
+    const child = spawn(cmd,args,options);
+
+    child.stdout.on("data", (data) => console.log(data.toString()));
+
+    child.on("error", reject);
+
+    child.on("close", (code) => {
+      if(code === 0) {
+        resolve(code);
+      }
+      else
+      {
+        reject(new Error(`Process exited with code ${code}`));
+      }
+    })
+  })
 }
 
 
@@ -99,6 +101,7 @@ function buildCommand(id)
   let fileObject = VideoMetaData.get(id);
   commandArr.push(`-i`);
   commandArr.push(`placeholder`);
+  commandArr.push(...[`-progress`, `pipe:1`, `-nostats`]);
   console.log(fileObject);
   if(fileObject.ext == "mkv")
   {

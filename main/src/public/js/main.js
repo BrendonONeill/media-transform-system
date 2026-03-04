@@ -30,7 +30,6 @@ async function handleUpload(e)
  streamBlocksReset()
  let chunkSizes = storeChunkValues(filesCollection[0].mediaChunks)
  videoFormInformation.chunkSizes = chunkSizes
- debugger
  await uploadFileForInfo(filesCollection[0], chunkSizes)
  url = URL.createObjectURL(e.target.files[0])
  createScreenShot()
@@ -71,7 +70,7 @@ function chunkVideo(file)
 }
 
 
-function storeChunkValues(chunks, videoFormInformation)
+function storeChunkValues(chunks)
 {
     let chunkSizes = []
     for(let i = 0; i < chunks.length; i++)

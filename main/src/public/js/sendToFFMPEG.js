@@ -40,7 +40,6 @@ export async function uploadPrep(chunksObj,id)
     try {
         videoFormInformation.chunks = chunks;
         let finishedUploadObj = videoFormInformation;
-        console.log(finishedUploadObj)
         let res = await fetch("http://localhost:3003/upload/finishedupload", {method:"POST", body:JSON.stringify(finishedUploadObj), headers: {'Content-Type': 'application/json'}})
         if(res.ok)
         {
@@ -81,7 +80,6 @@ async function uploadFetch(arrChunks,id)
         }
 
         const results = await Promise.all(taskPromises);
-        console.log(results)
         return []
         
     } catch (error) {
