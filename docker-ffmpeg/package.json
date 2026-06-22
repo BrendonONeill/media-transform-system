@@ -4,7 +4,8 @@
   "type": "module",
   "main": "ffmpeg.js",
   "scripts": {
-    "dev": "node src/ffmpeg.js"
+    "dev": "node src/ffmpeg.js",
+    "restart-cleanup": "node cleanup/cleanup.js"
   },
   "keywords": [],
   "author": "",
