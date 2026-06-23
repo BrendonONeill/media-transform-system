@@ -11,9 +11,9 @@
 :root {
   --main-bg-colour: #0077b6;
   --main-bg-light-colour: hsl(201, 100%, 40%);
-  --main-bg-colour-dark: #003b5b;
-  --main-bg-colour-dark-shade: #005f91;
-  --main-bg-colour-lighter-dark: #00537f;
+  --main-bg-colour-dark: #003450;
+  --main-bg-colour-dark-shade: #14648F;
+  --main-bg-colour-lighter-dark: #005685;
   --sub-bg-colour: #caf0f8;
   --dark-shade-white: #e5e5e5;
 }

@@ -5,6 +5,10 @@ import path from 'path'
 import { dirname} from 'path';
 import { fileURLToPath } from 'url';
 import videoReturnedRouter from './Routes/fileCreation/routes.js'
+import { Logger } from "../utils/logger.js";
+
+export const ErrorLogger = new Logger('error','./logs/clientError.txt');
+export const SystemLogger = new Logger('system','./logs/clientSystem.txt'); 
 
 const app = Express()
 
@@ -22,5 +26,6 @@ app.use("/return", videoReturnedRouter)
 
 
 app.listen("3000", () => {
+    SystemLogger.write("Server started")
     console.log("app listening on 3000")
 })
