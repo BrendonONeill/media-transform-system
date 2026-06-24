@@ -15,21 +15,21 @@ videoEmitter.on('chunk', chunkFileAndSendChunks);
 
 export async function main(fileObject)
 {
- SystemLogger.write(`Starting ffmpeg process on ${fileObject.oldFileName}.`);
+ SystemLogger.addToQueue(`Starting ffmpeg process on ${fileObject.oldFileName}.`);
  videoEmitter.emit('add', fileObject)
 }
 
 export async function videoAddTask(fileObject)
 {
   videoList.push(`${fileObject.oldFileName}.${fileObject.ext}`)
-  SystemLogger.write(`${fileObject.fileName} added to queue.`);
+  SystemLogger.addToQueue(`${fileObject.fileName} added to queue.`);
   if(!active)
   {
-    SystemLogger.write("Queue system started.");
+    SystemLogger.addToQueue("Queue system started.");
     active = true
     await videoWork(fileObject.id)
     active = false
-    SystemLogger.write("Queue system finished.");
+    SystemLogger.addToQueue("Queue system finished.");
   }
   return
 }
@@ -45,10 +45,10 @@ async function videoWork(id)
         
         let command = buildCommand(id)
         command = command.filter((cmd) => cmd !== '');
-        console.log('[command]: ', command)
+        //console.log('[command]: ', command)
         let videoInfoObj = VideoMetaData.get(id)
         await ffmpegAction(command, id)
-        console.log("[videoinfo]", videoInfo)
+        //console.log("[videoinfo]", videoInfo)
         fs.rmSync(`temp/IN/${videoInfoObj.inputFile}`);
         videoEmitter.emit('chunk', `${videoInfoObj.outputFile}`,"OUT",videoInfoObj)
     }
@@ -59,7 +59,7 @@ async function videoWork(id)
 async function ffmpegAction(command,id)
 {
     let videoInfoObj = VideoMetaData.get(id)
-    console.log(command)
+    //console.log(command)
     if(videoInfoObj.attachments)
     {
       const copyResults = await handleFfmpeg('ffmpeg',['-i', `temp/IN/${videoInfoObj.inputFile}`,'-map','0:v?','-map','0:a?','-map','0:s?', '-c', 'copy', `temp/IN/${videoInfoObj.id}-att.mkv` ],{})
@@ -69,7 +69,7 @@ async function ffmpegAction(command,id)
     const results = await handleFfmpeg('ffmpeg',command,{
       maxBuffer: 1024 * 1024 * 10,
     })
-    console.log(videoInfoObj.file, ' completed')
+    //console.log(videoInfoObj.file, ' completed')
 }
 
 function handleFfmpeg(cmd,args = [], options= {})

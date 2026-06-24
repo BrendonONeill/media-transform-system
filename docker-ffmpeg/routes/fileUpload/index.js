@@ -5,6 +5,8 @@ import { getVideoInformation } from '../../utils/ffprobe.js';
 import { SystemLogger, VideoMetaData } from '../../src/ffmpeg.js';
 import { v4 as uuidv4 } from 'uuid';
 
+//cron job to check logger queue
+
 export async function receivingChunks(req, res)
 {
  console.log("New Chunk received from: ", req.headers['x-original-filename'], req.headers['x-id-number']);
@@ -26,12 +28,12 @@ export async function finishedUpload(req, res){
   let chunkCheckResults = await chunkCheck(fileInformation)
   if(chunkCheckResults)
   {
-    SystemLogger.write(`//////////////////////////////////////////////////////////////`);
+    SystemLogger.actionSpacer();
     await generationFile(fileInformation, fileInformation.id);
     let fileCheckResults = await fileCheck(fileInformation.inputFile)
     if(fileCheckResults)
     {
-      SystemLogger.write(`File: ${fileInformation.oldFileName}.${fileInformation.ext} was uploaded successfully.`);
+      SystemLogger.addToQueue(`File: ${fileInformation.oldFileName}.${fileInformation.ext} was uploaded successfully.`);
       main(fileInformation);
       res.json("thank you");
     }
@@ -51,16 +53,15 @@ export async function finishedUploadffprob(req, res){
   let fileInformation = req.body
   if(await chunkCheck(fileInformation))
   {
-    SystemLogger.write(`//////////////////////////////////////////////////////////////`);
-    
+    SystemLogger.actionSpacer();
     await generationFile(fileInformation,fileInformation.id)
-    SystemLogger.write(`File: ${fileInformation.oldFileName}.${fileInformation.ext} was uploaded successfully.`);
+    SystemLogger.addToQueue(`File: ${fileInformation.oldFileName}.${fileInformation.ext} was uploaded successfully.`);
     let videoJson = getVideoInformation(`${fileInformation.id}-${fileInformation.oldFileName}.${fileInformation.ext}`)
-    SystemLogger.write(`Information on ${fileInformation.oldFileName}.${fileInformation.ext} was collected.`);
+    SystemLogger.addToQueue(`Information on ${fileInformation.oldFileName}.${fileInformation.ext} was collected.`);
     removeVideo(`${fileInformation.id}-${fileInformation.oldFileName}.${fileInformation.ext}`,"IN")
-    SystemLogger.write(`File: ${fileInformation.oldFileName}.${fileInformation.ext} was removed successfully.`);
-    SystemLogger.write(`File: ${fileInformation.oldFileName}.${fileInformation.ext} data returned to client.`);
-    SystemLogger.write(`//////////////////////////////////////////////////////////////`);
+    SystemLogger.addToQueue(`File: ${fileInformation.oldFileName}.${fileInformation.ext} was removed successfully.`);
+    SystemLogger.addToQueue(`File: ${fileInformation.oldFileName}.${fileInformation.ext} data returned to client.`);
+    SystemLogger.actionSpacer();
     res.json(videoJson)
   }
   else
