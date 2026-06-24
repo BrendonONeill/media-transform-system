@@ -1,0 +1,28 @@
+[24-06-26] | 15:50:41 |  System running...
+/////////////////////////////////////////////////////////////////////////////////////// 
+[24-06-26] | 15:50:57 |  File: file_example_MP4_1920_18MG.mp4 was uploaded successfully. 
+[24-06-26] | 15:50:57 |  Information on file_example_MP4_1920_18MG.mp4 was collected. 
+[24-06-26] | 15:50:57 |  File: file_example_MP4_1920_18MG.mp4 was removed successfully. 
+[24-06-26] | 15:50:57 |  File: file_example_MP4_1920_18MG.mp4 data returned to client. 
+/////////////////////////////////////////////////////////////////////////////////////// 
+/////////////////////////////////////////////////////////////////////////////////////// 
+[24-06-26] | 15:51:26 |  File: file_example_MP4_1920_18MG.mp4 was uploaded successfully. 
+[24-06-26] | 15:51:26 |  Starting ffmpeg process on file_example_MP4_1920_18MG. 
+[24-06-26] | 15:51:26 |  testing added to queue. 
+[24-06-26] | 15:51:26 |  Queue system started. 
+[24-06-26] | 15:51:30 |  Queue system finished. 
+/////////////////////////////////////////////////////////////////////////////////////// 
+[24-06-26] | 15:51:58 |  File: file_example_MP4_1920_18MG.mp4 was uploaded successfully. 
+[24-06-26] | 15:57:15 |  System running... 
+/////////////////////////////////////////////////////////////////////////////////////// 
+[24-06-26] | 15:57:31 |  File: file_example_MP4_1920_18MG.mp4 was uploaded successfully. 
+[24-06-26] | 15:57:31 |  Information on file_example_MP4_1920_18MG.mp4 was collected. 
+[24-06-26] | 15:57:31 |  File: file_example_MP4_1920_18MG.mp4 was removed successfully. 
+[24-06-26] | 15:57:31 |  File: file_example_MP4_1920_18MG.mp4 data returned to client. 
+/////////////////////////////////////////////////////////////////////////////////////// 
+/////////////////////////////////////////////////////////////////////////////////////// 
+[24-06-26] | 15:57:42 |  File: file_example_MP4_1920_18MG.mp4 was uploaded successfully. 
+[24-06-26] | 15:57:42 |  Starting ffmpeg process on file_example_MP4_1920_18MG. 
+[24-06-26] | 15:57:42 |  abc added to queue. 
+[24-06-26] | 15:57:42 |  Queue system started. 
+[24-06-26] | 15:57:45 |  Queue system finished. 

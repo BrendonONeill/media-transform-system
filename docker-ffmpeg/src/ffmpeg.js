@@ -14,7 +14,7 @@ app.use(Express.urlencoded({ extended: true }));
 
 
 app.use(cors("*"));
-SystemLogger.write("System running...")
+SystemLogger.addToQueue("System running...")
 app.use("/upload",VideoChunkingRouter)
 app.use("/videoinfo", videoInfoRouter)
 

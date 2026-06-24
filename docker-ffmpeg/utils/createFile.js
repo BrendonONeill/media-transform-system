@@ -8,8 +8,6 @@ export  async function generationFile(videoInformation,id=null)
 {
     // Rewrite this function to make sure chunks go into file
     try {
-        //console.log("Creating video from chunks")
-        //console.log(videoInformation)
         
         const fileName = `./temp/IN/${id}-${videoInformation.oldFileName}.${videoInformation.ext}`;
         let writeStream = fs.createWriteStream(fileName);
