@@ -7,6 +7,7 @@ import { Logger } from '../utils/logger.js';
 export const VideoMetaData = new Map()
 export const ErrorLogger = new Logger('error','./logs/error.txt');
 export const SystemLogger = new Logger('system','./logs/system.txt'); 
+export const FFMPEGLogger = new Logger('ffmpeg','./logs/ffmpeg.txt'); 
 
 const app = Express()
 app.use(Express.json());

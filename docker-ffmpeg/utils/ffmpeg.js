@@ -1,5 +1,6 @@
 import { spawnSync } from 'child_process';
 import { spawn } from 'node:child_process';
+import { FFMPEGLogger } from '../src/ffmpeg.js';
 
 import { EventEmitter } from 'node:events';
 import {chunkFileAndSendChunks, removeVideo} from '../utils/createFile.js';
@@ -48,7 +49,7 @@ async function videoWork(id)
         //console.log('[command]: ', command)
         let videoInfoObj = VideoMetaData.get(id)
         await ffmpegAction(command, id)
-        //console.log("[videoinfo]", videoInfo)
+        console.log("[videoinfo]", videoInfo)
         fs.rmSync(`temp/IN/${videoInfoObj.inputFile}`);
         videoEmitter.emit('chunk', `${videoInfoObj.outputFile}`,"OUT",videoInfoObj)
     }
@@ -59,25 +60,28 @@ async function videoWork(id)
 async function ffmpegAction(command,id)
 {
     let videoInfoObj = VideoMetaData.get(id)
-    //console.log(command)
+    console.log(command)
     if(videoInfoObj.attachments)
     {
-      const copyResults = await handleFfmpeg('ffmpeg',['-i', `temp/IN/${videoInfoObj.inputFile}`,'-map','0:v?','-map','0:a?','-map','0:s?', '-c', 'copy', `temp/IN/${videoInfoObj.id}-att.mkv` ],{})
+      const copyResults = await handleFfmpeg(videoInfoObj,'ffmpeg',['-i', `temp/IN/${videoInfoObj.inputFile}`,'-map','0:v?','-map','0:a?','-map','0:s?', '-c', 'copy', `temp/IN/${videoInfoObj.id}-att.mkv` ],{})
       command[1] = `temp/IN/${videoInfoObj.id}-att.mkv`
     }
 
-    const results = await handleFfmpeg('ffmpeg',command,{
+    const results = await handleFfmpeg(videoInfoObj,'ffmpeg',command,{
       maxBuffer: 1024 * 1024 * 10,
     })
     //console.log(videoInfoObj.file, ' completed')
 }
 
-function handleFfmpeg(cmd,args = [], options= {})
+function handleFfmpeg(videoInfoObj,cmd,args = [], options= {})
 {
   return new Promise((resolve, reject) => {
     const child = spawn(cmd,args,options);
 
-    child.stdout.on("data", (data) => console.log(data.toString()));
+    child.stdout.on("data", (data) => {
+      let obj = BufferToObject(data)
+      planOutLogging(videoInfoObj,obj)
+    });
 
     child.on("error", reject);
 
@@ -247,4 +251,40 @@ function handledStreams(arrayOfCommands,encoded)
   }
   
   return commandArr
+}
+
+function planOutLogging(videoInfoObj, data){
+  
+  let percentComplete = handlePercent(videoInfoObj.duration,data.out_time_ms)
+  console.log(`${FFMPEGLogger.time()} ${percentComplete} drop_frames:${data.drop_frames}  Total Size: ${data.total_size}  Progress: ${data.progress}`)
+}
+
+function handlePercent(duration,completeInMs){
+  let secondsComplete = completeInMs/1000000
+  return Math.round((secondsComplete/duration)*100)+'%'
+}
+
+function BufferToObject(buffer)
+{
+  const text = buffer.toString("utf8").trim();
+  const lines = text.split("\n");
+
+  const result = {};
+
+  for (const line of lines) {
+    const cleanLine = line.trim();
+
+    if (!cleanLine) continue;
+
+    const separatorIndex = cleanLine.indexOf("=");
+
+    if (separatorIndex === -1) continue;
+
+    const key = cleanLine.slice(0, separatorIndex).trim();
+    const value = cleanLine.slice(separatorIndex + 1).trim();
+
+    result[key] = value;
+  }
+
+  return result;
 }
