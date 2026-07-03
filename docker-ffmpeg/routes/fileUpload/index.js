@@ -25,17 +25,17 @@ export async function finishedUpload(req, res){
   let fileInformation = req.body;
   generationFileNames(fileInformation)
   VideoMetaData.set(fileInformation.id,fileInformation);
-  let chunkCheckResults = await chunkCheck(fileInformation)
+  let chunkCheckResults = await chunkCheck(fileInformation);
+  SystemLogger.addToQueue(`All chunks arrived at server`);
   if(chunkCheckResults)
   {
-    SystemLogger.actionSpacer();
     await generationFile(fileInformation, fileInformation.id);
     let fileCheckResults = await fileCheck(fileInformation.inputFile)
     if(fileCheckResults)
     {
       SystemLogger.addToQueue(`File: ${fileInformation.oldFileName}.${fileInformation.ext} was uploaded successfully.`);
       main(fileInformation);
-      res.json("thank you");
+      res.json("File was uploaded successfully");
     }
     else
     {

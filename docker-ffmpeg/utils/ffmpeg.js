@@ -46,10 +46,10 @@ async function videoWork(id)
         
         let command = buildCommand(id)
         command = command.filter((cmd) => cmd !== '');
-        //console.log('[command]: ', command)
+        SystemLogger.addToQueue(`[command]: ${command}`)
         let videoInfoObj = VideoMetaData.get(id)
         await ffmpegAction(command, id)
-        console.log("[videoinfo]", videoInfo)
+        //console.log("[videoinfo]", videoInfo)
         fs.rmSync(`temp/IN/${videoInfoObj.inputFile}`);
         videoEmitter.emit('chunk', `${videoInfoObj.outputFile}`,"OUT",videoInfoObj)
     }
@@ -60,7 +60,6 @@ async function videoWork(id)
 async function ffmpegAction(command,id)
 {
     let videoInfoObj = VideoMetaData.get(id)
-    console.log(command)
     if(videoInfoObj.attachments)
     {
       const copyResults = await handleFfmpeg(videoInfoObj,'ffmpeg',['-i', `temp/IN/${videoInfoObj.inputFile}`,'-map','0:v?','-map','0:a?','-map','0:s?', '-c', 'copy', `temp/IN/${videoInfoObj.id}-att.mkv` ],{})
@@ -70,7 +69,8 @@ async function ffmpegAction(command,id)
     const results = await handleFfmpeg(videoInfoObj,'ffmpeg',command,{
       maxBuffer: 1024 * 1024 * 10,
     })
-    //console.log(videoInfoObj.file, ' completed')
+    //console.log(videoInfoObj.outputFile, ' completed')
+    SystemLogger.addToQueue(`${videoInfoObj.outputFile} file was created`);
 }
 
 function handleFfmpeg(videoInfoObj,cmd,args = [], options= {})
@@ -87,6 +87,7 @@ function handleFfmpeg(videoInfoObj,cmd,args = [], options= {})
 
     child.on("close", (code) => {
       if(code === 0) {
+        FFMPEGLogger.actionSpacer();
         resolve(code);
       }
       else
@@ -106,7 +107,6 @@ function buildCommand(id)
   commandArr.push(`-i`);
   commandArr.push(`placeholder`);
   commandArr.push(...[`-progress`, `pipe:1`, `-nostats`]);
-  console.log(fileObject);
   if(fileObject.ext == "mkv")
   {
     handleAttachments(fileObject);
@@ -141,7 +141,7 @@ function buildCommand(id)
 
 function handleAttachments(fileObject)
 {
-  console.log(fileObject);
+  //console.log(fileObject);
   let attachmentStreams = fileObject.streamArrayInformation.some((obj) => obj.type === 'attachment');
   if(!attachmentStreams)
   {
@@ -256,7 +256,8 @@ function handledStreams(arrayOfCommands,encoded)
 function planOutLogging(videoInfoObj, data){
   
   let percentComplete = handlePercent(videoInfoObj.duration,data.out_time_ms)
-  console.log(`${FFMPEGLogger.time()} ${percentComplete} drop_frames:${data.drop_frames}  Total Size: ${data.total_size}  Progress: ${data.progress}`)
+  console.log(`${FFMPEGLogger.time()} File: ${videoInfoObj.outputFile} ${percentComplete} drop_frames:${data.drop_frames}  Total Size: ${data.total_size}  Progress: ${data.progress}`)
+  FFMPEGLogger.addToQueue(`File: ${videoInfoObj.outputFile} ${percentComplete} drop_frames:${data.drop_frames}  Total Size: ${data.total_size}  Progress: ${data.progress}`)
 }
 
 function handlePercent(duration,completeInMs){

@@ -28,7 +28,10 @@ export async function uploadFileForInfo(chunks,chunkSizes)
             let data = await res.json()
             updateFFPROBE(chunks.mediaChunks[0])
             generateFormParts(data.streams, chunks)
+            console.log("testing: ",data.streams)
             videoInfo = data;
+            let vidDuration = videoDuration(data.streams)
+            videoFormInformation.duration = vidDuration;
             videoFormInformation.id = id;
             loading();
         }
@@ -50,4 +53,15 @@ export function loading(text = "")
     {
        loadingBG.classList.add("hide") 
     }
+}
+
+
+function videoDuration(streams)
+{
+    for(const stream of streams){
+        if(stream.codec_type == 'video')
+        {
+            return Math.round(stream.duration)
+        }
+    } 
 }
