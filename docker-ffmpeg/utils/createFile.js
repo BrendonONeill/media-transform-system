@@ -3,6 +3,7 @@ import { buffer } from 'stream/consumers';
 import { Blob } from 'buffer';
 import { VideoMetaData } from "../src/ffmpeg.js";
 import mediaFormats from "./mediaFormats.js";
+import { SystemLogger } from "../src/ffmpeg.js";
 
 export  async function generationFile(videoInformation,id=null)
 {
@@ -17,6 +18,7 @@ export  async function generationFile(videoInformation,id=null)
             const chunkFile = `./bucket/${i}__${videoInformation.oldFileName}__${videoInformation.id}`;
             if (!fs.existsSync(chunkFile)) {
                 console.log(`No more files found. Stopped at ${i}/${videoInformation.chunks}`);
+                SystemLogger.addToQueue(`No more files found. Stopped at ${i}/${videoInformation.chunks}`)
                 break;
             }
 
@@ -37,9 +39,6 @@ export  async function generationFile(videoInformation,id=null)
                 });
 
                 readStream.on("end", () => {
-                    // console.log(`---------------------`);
-                   // console.log(`Streamed: ${chunkFile}`);
-                   //console.log(`---------------------`);
                     resolve();
                 });
             })
@@ -50,6 +49,7 @@ export  async function generationFile(videoInformation,id=null)
                 writeStream.on("finish", resolve);
                 writeStream.on("error", reject);
         });
+        SystemLogger.addToQueue(`${fileName} was created successfully`);
         removeChunks(videoInformation.chunks,videoInformation.oldFileName, videoInformation.id);
     } catch (error) {
         
@@ -170,6 +170,7 @@ function removeChunks(chunks,name, id)
 
 export async function chunkFileAndSendChunks(fileName,dir,vo)
 {
+    SystemLogger.addToQueue('Creating chunks to send back to user')
     const readStream = fs.createReadStream(`temp/${dir}/${fileName}`);
     const fileBuffer = await buffer(readStream);
     //Automate type
@@ -179,6 +180,7 @@ export async function chunkFileAndSendChunks(fileName,dir,vo)
     const blob = new Blob([fileBuffer],{type});
     let chunkObj = chunkVideo(blob, fileName)
     removeVideo(fileName,"OUT");
+    SystemLogger.addToQueue('Sending chunks back to user')
     sendBackPrep(chunkObj,vo.id);
 }
 
@@ -236,6 +238,8 @@ async function sendBackPrep(chunksObj,id)
         let res = await fetch("http://localhost:3000/return/finishedUpload", {method:"POST", body:JSON.stringify({name: fileName, ext: returnedExt, chunks,location,id, chunkSizes}), headers: {'Content-Type': 'application/json'}})
         if(res.ok)
         {
+            SystemLogger.addToQueue('Sent back to main server');
+            SystemLogger.actionSpacer();
             console.log("Sent back to main server");
             return
         }

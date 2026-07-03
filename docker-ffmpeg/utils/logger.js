@@ -9,7 +9,7 @@ export class Logger{
         this.fileLocation = fileLocation;
     }
 
-    async write(value)
+    async write()
     {
         while(this.logsQueue.length >= 1)
         {
@@ -49,5 +49,26 @@ export class Logger{
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const year = String(now.getFullYear()).slice(-2);
         return `[${day}-${month}-${year}] | ${hours}:${minutes}:${seconds} | `;
+    }
+
+
+    cleanupQueue()
+    {
+        if(this.active)
+        {
+            return
+        }
+
+        this.active = true;
+
+        while(this.logsQueue.length >= 1)
+        {
+            try {
+                let log = this.logsQueue.shift();   
+                fs.appendFileSync(this.fileLocation,log,'utf8');
+            } catch (error) {
+                //handle error
+            }
+        }
     }
 }
